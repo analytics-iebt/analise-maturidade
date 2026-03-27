@@ -4,6 +4,256 @@ const cheerio = require('cheerio');
 const BASE_TIMEOUT = 15000;
 const MAX_PAGES = 8;
 
+const SECTOR_BENCHMARKS = {
+  'Tecnologia': {
+    avgScores: { presenceDigital: 75, socialMedia: 70, cultureInnovation: 80, communication: 72, transformation: 78 },
+    avgFinalScore: 75,
+    leaders: ['Nvidia', 'Apple', 'Microsoft', 'Google', 'Amazon', 'Meta', 'IBM', 'SAP', 'Oracle', 'Salesforce', 'Totvs', 'Locaweb', 'T-Mobile'],
+    description: 'Setor de alta tecnologia e inovação'
+  },
+  'Financeiro': {
+    avgScores: { presenceDigital: 70, socialMedia: 65, cultureInnovation: 55, communication: 68, transformation: 75 },
+    avgFinalScore: 65,
+    leaders: ['Itau', 'Bradesco', 'Santander', 'Banco do Brasil', 'XP Inc', 'Nubank', 'C6 Bank', 'Inter', 'BTG Pactual', 'Safra'],
+    description: 'Setor financeiro e bancário'
+  },
+  'Varejo': {
+    avgScores: { presenceDigital: 72, socialMedia: 78, cultureInnovation: 50, communication: 70, transformation: 65 },
+    avgFinalScore: 68,
+    leaders: ['Magazine Luiza', 'Americanas', 'Casas Bahia', 'Mercado Livre', 'Amazon Brasil', 'Shopee', 'Via Varejo', 'Renner', 'C&A', 'Macy\'s'],
+    description: 'Setor de varejo e e-commerce'
+  },
+  'Saúde': {
+    avgScores: { presenceDigital: 65, socialMedia: 60, cultureInnovation: 58, communication: 62, transformation: 55 },
+    avgFinalScore: 60,
+    leaders: ['Hospital Israelita Albert Einstein', 'Sírio-Libanês', 'Prevent Senior', 'Amil', 'Bradesco Saúde', 'Odonto', 'Fleury', 'DASA'],
+    description: 'Setor de saúde e pharma'
+  },
+  'Educação': {
+    avgScores: { presenceDigital: 68, socialMedia: 65, cultureInnovation: 72, communication: 75, transformation: 60 },
+    avgFinalScore: 68,
+    leaders: ['Khan Academy', 'Coursera', 'Duolingo', 'Descomplica', 'Abitamento', 'Anhanguera', 'Pitágoras', 'Estácio', 'Grupo Positivo'],
+    description: 'Setor de educação e edtech'
+  },
+  'Industrial': {
+    avgScores: { presenceDigital: 55, socialMedia: 50, cultureInnovation: 65, communication: 52, transformation: 60 },
+    avgFinalScore: 57,
+    leaders: ['Embraer', 'WEG', 'Petrobras', 'Vale', 'Gerdau', 'Ambev', 'BRF', 'Suzano', 'Klabin'],
+    description: 'Setor industrial e manufacturing'
+  },
+  'Serviços': {
+    avgScores: { presenceDigital: 62, socialMedia: 58, cultureInnovation: 55, communication: 60, transformation: 55 },
+    avgFinalScore: 58,
+    leaders: ['Accenture', 'Deloitte', 'PwC', 'EY', 'KPMG', 'McKinsey', 'Randstad', 'Adecco'],
+    description: 'Setor de serviços profissionais'
+  },
+  'Imobiliário': {
+    avgScores: { presenceDigital: 65, socialMedia: 70, cultureInnovation: 45, communication: 62, transformation: 58 },
+    avgFinalScore: 60,
+    leaders: ['MRV', 'Cyrela', 'Tenda', 'Eztec', 'Moura Dubeux', 'Aliansce', 'Multiplan', 'Iguatemi'],
+    description: 'Setor imobiliário e construção'
+  },
+  'Alimentação': {
+    avgScores: { presenceDigital: 60, socialMedia: 72, cultureInnovation: 48, communication: 65, transformation: 55 },
+    avgFinalScore: 60,
+    leaders: ['McDonald\'s Brasil', 'Burger King', 'Subway Brasil', 'Starbucks Brasil', 'Domino\'s', 'iFood', 'Rappi'],
+    description: 'Setor de alimentação e food service'
+  },
+  'Automotivo': {
+    avgScores: { presenceDigital: 68, socialMedia: 65, cultureInnovation: 70, communication: 65, transformation: 72 },
+    avgFinalScore: 69,
+    leaders: ['Toyota Brasil', 'Volkswagen', 'Ford Brasil', 'Chevrolet', 'Jeep Brasil', 'CAOA', 'BYD Brasil', 'Tesla'],
+    description: 'Setor automotivo'
+  },
+  'Telecomunicações': {
+    avgScores: { presenceDigital: 72, socialMedia: 70, cultureInnovation: 65, communication: 70, transformation: 72 },
+    avgFinalScore: 70,
+    leaders: ['Vivo', 'Claro', 'TIM Brasil', 'Oi', 'Sky Brasil', 'Netflix Brasil', 'Globoplay'],
+    description: 'Setor de telecomunicações e streaming'
+  },
+  'Associações': {
+    avgScores: { presenceDigital: 55, socialMedia: 58, cultureInnovation: 62, communication: 58, transformation: 48 },
+    avgFinalScore: 56,
+    leaders: ['CNC', 'Fecomério', ' CDL BH', 'Fenavist', 'Sesi', 'Senai', 'Sebrae', 'ACSP'],
+    description: 'Setor de associações e entidades de classe'
+  },
+  'Default': {
+    avgScores: { presenceDigital: 60, socialMedia: 55, cultureInnovation: 55, communication: 58, transformation: 55 },
+    avgFinalScore: 57,
+    leaders: [],
+    description: 'Setor genérico'
+  }
+};
+
+function classifySector(analysis, socialMedia) {
+  const text = `${analysis.title} ${analysis.description} ${analysis.ogTitle} ${analysis.ogDescription} ${Object.keys(analysis.innovationKeywords).join(' ')}`.toLowerCase();
+  const headings = analysis.headings.join(' ').toLowerCase();
+  const content = (analysis.mainContent || '').toLowerCase();
+  const combined = text + ' ' + headings + ' ' + content;
+  
+  const sectorKeywords = {
+    'Tecnologia': ['tecnologia', 'software', ' TI ', ' ti ', 'tech', 'digital', 'inovação', 'inovacao', 'dev', 'programação', 'programacao', 'cloud', 'saas', 'data', 'analytics', 'automação', 'automacao'],
+    'Financeiro': ['banco', 'financeiro', 'investimento', 'crédito', 'credito', 'seguros', 'corretora', 'bolsa', 'trading', 'fgts', 'previdência', 'previdencia', 'bank', 'banking'],
+    'Varejo': ['varejo', 'loja', 'e-commerce', 'ecommerce', 'shop', 'store', 'mart', 'comércio', 'comercio', 'marketplace', 'atacado'],
+    'Saúde': ['saúde', 'saude', 'hospital', 'médico', 'medico', 'clínica', 'clinica', 'laboratório', 'laboratorio', 'farmácia', 'farmacia', 'pharma', 'dental', 'odont'],
+    'Educação': ['educação', 'educacao', 'ensino', 'escola', 'universidade', 'curso', 'treinamento', 'ead', 'aprendizado', 'learning', 'academy'],
+    'Industrial': ['indústria', 'industria', 'fábrica', 'fabrica', 'manufatura', 'manufacturing', 'produção', 'producao', 'metalurgia', 'siderurgia', 'química', 'quimica'],
+    'Serviços': ['serviços', 'servicos', 'consultoria', 'advocacia', 'advogado', 'contabilidade', 'rh', 'recursos humanos', 'outsourcing', 'consulting'],
+    'Imobiliário': ['imobiliária', 'imobiliaria', 'imóvel', 'imovel', 'apartamento', 'casa', 'loteamento', 'incorporadora', 'construtora', 'real estate'],
+    'Alimentação': ['alimentação', 'alimentacao', 'restaurante', 'lanchonete', 'food', 'bebida', 'café', 'cafe', 'padaria', 'confeitaria', 'gourmet', 'fast food'],
+    'Automotivo': ['automotivo', 'carro', 'veículo', 'veiculo', 'moto', 'bicicleta', 'automobile', 'concessionária', 'concessionaria', 'montadora'],
+    'Telecomunicações': ['telecom', 'telefonia', 'celular', 'internet', 'tv ', 'streaming', 'cabo', 'fibra', 'banda larga', 'provedor'],
+    'Associações': ['associação', 'associacao', 'sindicato', ' CDL ', 'câmara', 'camara', 'federacão', 'federacao', 'confederação', 'confederacao', 'entidade', 'classe', 'comércio', 'comercio', 'industrial']
+  };
+  
+  let bestMatch = { sector: 'Default', score: 0 };
+  
+  for (const [sector, keywords] of Object.entries(sectorKeywords)) {
+    let matchScore = 0;
+    for (const keyword of keywords) {
+      if (combined.includes(keyword)) {
+        matchScore += 1;
+      }
+    }
+    if (matchScore > bestMatch.score) {
+      bestMatch = { sector, score: matchScore };
+    }
+  }
+  
+  if (socialMedia?.linkedin?.industry) {
+    const linkedInIndustry = socialMedia.linkedin.industry.toLowerCase();
+    for (const sector of Object.keys(sectorKeywords)) {
+      if (linkedInIndustry.includes(sector.toLowerCase())) {
+        bestMatch = { sector, score: bestMatch.score + 5 };
+        break;
+      }
+    }
+  }
+  
+  return bestMatch.sector;
+}
+
+function generateBenchmark(analysis, scores, sector) {
+  const benchmark = SECTOR_BENCHMARKS[sector] || SECTOR_BENCHMARKS['Default'];
+  
+  const gaps = {};
+  const comparisons = {};
+  
+  for (const [dimension, value] of Object.entries(scores)) {
+    if (dimension === 'finalScore') continue;
+    const avgValue = benchmark.avgScores[dimension] || 55;
+    const gap = value - avgValue;
+    gaps[dimension] = gap;
+    comparisons[dimension] = {
+      company: value,
+      sectorAvg: avgValue,
+      gap: gap,
+      status: gap > 10 ? 'above' : gap < -10 ? 'below' : 'average'
+    };
+  }
+  
+  const overallGap = scores.finalScore - benchmark.avgFinalScore;
+  
+  const percentile = calculatePercentile(scores.finalScore, benchmark.avgFinalScore);
+  
+  return {
+    sector,
+    sectorDescription: benchmark.description,
+    avgScores: benchmark.avgScores,
+    avgFinalScore: benchmark.avgFinalScore,
+    companyScore: scores.finalScore,
+    overallGap,
+    percentile,
+    dimensionComparisons: comparisons,
+    leaders: benchmark.leaders.slice(0, 5),
+    recommendations: generateGapRecommendations(gaps, sector)
+  };
+}
+
+function calculatePercentile(companyScore, sectorAvg) {
+  const stdDev = 15;
+  const zScore = (companyScore - sectorAvg) / stdDev;
+  
+  if (zScore >= 1.5) return 'Top 10%';
+  if (zScore >= 1) return 'Top 15%';
+  if (zScore >= 0.5) return 'Top 25%';
+  if (zScore >= 0) return 'Acima da média';
+  if (zScore >= -0.5) return 'Na média';
+  if (zScore >= -1) return 'Abaixo da média';
+  if (zScore >= -1.5) return 'Bottom 25%';
+  return 'Bottom 15%';
+}
+
+function generateGapRecommendations(gaps, sector) {
+  const recommendations = [];
+  
+  const sortedGaps = Object.entries(gaps)
+    .map(([dim, gap]) => ({ dimension: dim, gap }))
+    .sort((a, b) => a.gap - b.gap);
+  
+  const dimensionLabels = {
+    presenceDigital: 'Presença Digital',
+    socialMedia: 'Redes Sociais',
+    cultureInnovation: 'Cultura de Inovação',
+    communication: 'Comunicação',
+    transformation: 'Transformação Digital'
+  };
+  
+  const worstGaps = sortedGaps.slice(0, 2);
+  
+  for (const { dimension, gap } of worstGaps) {
+    if (gap < -15) {
+      const label = dimensionLabels[dimension] || dimension;
+      recommendations.push({
+        dimension: label,
+        priority: 'high',
+        gap: Math.abs(gap),
+        action: getGapAction(dimension, sector)
+      });
+    }
+  }
+  
+  return recommendations;
+}
+
+function getGapAction(dimension, sector) {
+  const actions = {
+    presenceDigital: [
+      'Implementar SEO técnico avançado',
+      'Otimizar Core Web Vitals',
+      'Desenvolver PWA para mobile',
+      'Criar landing pages para campanhas'
+    ],
+    socialMedia: [
+      'Definir calendário editorial',
+      'Investir em conteúdo pago',
+      'Ativar automação de redes sociais',
+      'Implementar social listening'
+    ],
+    cultureInnovation: [
+      'Documentar processos de inovação',
+      'Criar programa de mentoria',
+      'Estabelecer parcerias com startups',
+      'Implementar metodologias ágeis'
+    ],
+    communication: [
+      'Produzir conteúdo semanal',
+      'Investir em conteúdo em vídeo',
+      'Criar newsletter mensal',
+      'Desenvolver podcast institucional'
+    ],
+    transformation: [
+      'Automatizar processos com RPA',
+      'Implementar CRM',
+      'Criar analytics dashboard',
+      'Digitalizar jornada do cliente'
+    ]
+  };
+  
+  const dimensionActions = actions[dimension] || ['Investigar oportunidades de melhoria'];
+  return dimensionActions[Math.floor(Math.random() * dimensionActions.length)];
+}
+
 async function fetchSite(url, timeout = BASE_TIMEOUT) {
   try {
     const response = await axios.get(url, {
@@ -942,6 +1192,11 @@ async function analyzeSite(url, llmConfig = null) {
   const activeSocials = socialMedia.summary?.activeProfiles || 0;
   console.log(`Redes sociais ativas encontradas: ${activeSocials}`);
   
+  console.log(`Classificando setor e gerando benchmark...`);
+  const sector = classifySector(analysis, socialMedia);
+  console.log(`Setor identificado: ${sector}`);
+  analysis.sector = sector;
+  
   if (llmConfig && llmConfig.apiKey) {
     console.log(`Usando LLM (${llmConfig.provider}) para análise avançada...`);
     const llmResult = await analyzeWithLLM(analysis, llmConfig);
@@ -963,23 +1218,25 @@ async function analyzeSite(url, llmConfig = null) {
   const findings = getMainFindings(analysis, scores);
   const recommendations = getRecommendations(scores);
   const maturity = getMaturityLevel(scores.finalScore);
+  const benchmark = generateBenchmark(analysis, scores, sector);
   
   const result = {
     empresa: companyName,
-    segmento: 'A ser definido',
+    segmento: sector,
     scores: scores,
     maturidade: { level: maturity.level, name: maturity.name },
     forces,
     gaps,
     findings,
     recommendations,
+    benchmark,
     roadmap: [
       { quarter: 'Q2 2026', focus: 'Curto Prazo', deliverables: recommendations.short.slice(0, 2).join(', ') },
       { quarter: 'Q3 2026', focus: 'Médio Prazo', deliverables: recommendations.medium.slice(0, 2).join(', ') },
       { quarter: 'Q4 2026', focus: 'Consolidação', deliverables: recommendations.medium[2] || 'Expansão' },
       { quarter: 'Q1 2027', focus: 'Longo Prazo', deliverables: recommendations.long.slice(0, 2).join(', ') },
     ],
-    summary: `Análise do site ${companyName} revelando um perfil de maturidade ${maturity.name} (${scores.finalScore}/100). A empresa demonstra ${scores.finalScore >= 60 ? 'presença digital consolidada com oportunidades de evolução' : scores.finalScore >= 40 ? 'fundamentos estabelecidos que necessitam de desenvolvimento estratégico' : 'espaço significativo para investimento em presença digital e inovação'}.`,
+    summary: `Análise do site ${companyName} revelando um perfil de maturidade ${maturity.name} (${scores.finalScore}/100) no setor de ${benchmark.sectorDescription}. A empresa está ${benchmark.percentile} do setor. ${scores.finalScore >= 60 ? 'Presença digital consolidada com oportunidades de evolução' : scores.finalScore >= 40 ? 'Fundamentos estabelecidos que necessitam de desenvolvimento estratégico' : 'Espaço significativo para investimento em presença digital e inovação'}.`,
     using_llm: false,
     provider: 'REGRAS',
   };
@@ -1102,6 +1359,26 @@ function generateHTMLReport(result, analysis) {
         .social-stat { font-size: 1.2rem; font-weight: 700; color: var(--dark); }
         .social-label { font-size: 0.8rem; color: var(--gray); }
         .social-item.inactive { opacity: 0.5; }
+        .benchmark-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .benchmark-table th, .benchmark-table td { padding: 12px 15px; text-align: center; border-bottom: 1px solid #eee; }
+        .benchmark-table th { background: var(--light); color: var(--primary); font-weight: 600; }
+        .benchmark-table tr:hover { background: var(--light); }
+        .benchmark-bar { height: 8px; background: #e9ecef; border-radius: 4px; overflow: hidden; margin-top: 5px; }
+        .benchmark-fill { height: 100%; border-radius: 4px; }
+        .benchmark-fill.above { background: var(--success); }
+        .benchmark-fill.average { background: var(--warning); }
+        .benchmark-fill.below { background: var(--danger); }
+        .percentile-badge { display: inline-block; padding: 8px 20px; border-radius: 20px; font-weight: 600; }
+        .percentile-badge.top { background: var(--success); color: white; }
+        .percentile-badge.above { background: #81c784; color: white; }
+        .percentile-badge.average { background: var(--warning); color: white; }
+        .percentile-badge.below { background: #e57373; color: white; }
+        .percentile-badge.bottom { background: var(--danger); color: white; }
+        .leader-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+        .leader-tag { background: var(--light); padding: 4px 12px; border-radius: 15px; font-size: 0.85rem; color: var(--gray); }
+        .gap-high { color: var(--danger); font-weight: 600; }
+        .gap-medium { color: var(--warning); font-weight: 600; }
+        .gap-good { color: var(--success); font-weight: 600; }
     </style>
 </head>
 <body>
@@ -1228,6 +1505,86 @@ function generateHTMLReport(result, analysis) {
                 <div class="score-item ${getScoreClass(result.scores.transformation)}"><div class="score-value">${result.scores.transformation}</div><div class="score-label">Transformação (15%)</div></div>
             </div>
         </section>
+
+        ${result.benchmark ? `
+        <section class="card">
+            <h2>Benchmark Setorial</h2>
+            <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 20px; flex-wrap: wrap;">
+                <div>
+                    <p style="color: var(--gray); font-size: 0.9rem;">Setor identificado</p>
+                    <p style="font-size: 1.2rem; font-weight: 600; color: var(--primary);">${result.benchmark.sector}</p>
+                </div>
+                <div>
+                    <p style="color: var(--gray); font-size: 0.9rem;">Média do setor</p>
+                    <p style="font-size: 1.2rem; font-weight: 600;">${result.benchmark.avgFinalScore}/100</p>
+                </div>
+                <div>
+                    <p style="color: var(--gray); font-size: 0.9rem;">Comparação</p>
+                    <span class="percentile-badge ${result.benchmark.percentile.includes('Top') ? 'top' : result.benchmark.percentile.includes('Acima') ? 'above' : result.benchmark.percentile.includes('Na') ? 'average' : 'below'}">${result.benchmark.percentile}</span>
+                </div>
+            </div>
+            <table class="benchmark-table">
+                <thead>
+                    <tr><th>Dimensão</th><th>Sua Nota</th><th>Média Setorial</th><th>Diferença</th><th>Comparação</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="text-align: left;">Presença Digital</td>
+                        <td><strong>${result.benchmark.dimensionComparisons.presenceDigital.company}</strong></td>
+                        <td>${result.benchmark.dimensionComparisons.presenceDigital.sectorAvg}</td>
+                        <td class="${result.benchmark.dimensionComparisons.presenceDigital.gap > 0 ? 'gap-good' : result.benchmark.dimensionComparisons.presenceDigital.gap < -10 ? 'gap-high' : ''}">${result.benchmark.dimensionComparisons.presenceDigital.gap > 0 ? '+' : ''}${result.benchmark.dimensionComparisons.presenceDigital.gap}</td>
+                        <td><div class="benchmark-bar"><div class="benchmark-fill ${result.benchmark.dimensionComparisons.presenceDigital.status}" style="width: ${result.benchmark.dimensionComparisons.presenceDigital.company}%;"></div></div></td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">Redes Sociais</td>
+                        <td><strong>${result.benchmark.dimensionComparisons.socialMedia.company}</strong></td>
+                        <td>${result.benchmark.dimensionComparisons.socialMedia.sectorAvg}</td>
+                        <td class="${result.benchmark.dimensionComparisons.socialMedia.gap > 0 ? 'gap-good' : result.benchmark.dimensionComparisons.socialMedia.gap < -10 ? 'gap-high' : ''}">${result.benchmark.dimensionComparisons.socialMedia.gap > 0 ? '+' : ''}${result.benchmark.dimensionComparisons.socialMedia.gap}</td>
+                        <td><div class="benchmark-bar"><div class="benchmark-fill ${result.benchmark.dimensionComparisons.socialMedia.status}" style="width: ${result.benchmark.dimensionComparisons.socialMedia.company}%;"></div></div></td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">Cultura de Inovação</td>
+                        <td><strong>${result.benchmark.dimensionComparisons.cultureInnovation.company}</strong></td>
+                        <td>${result.benchmark.dimensionComparisons.cultureInnovation.sectorAvg}</td>
+                        <td class="${result.benchmark.dimensionComparisons.cultureInnovation.gap > 0 ? 'gap-good' : result.benchmark.dimensionComparisons.cultureInnovation.gap < -10 ? 'gap-high' : ''}">${result.benchmark.dimensionComparisons.cultureInnovation.gap > 0 ? '+' : ''}${result.benchmark.dimensionComparisons.cultureInnovation.gap}</td>
+                        <td><div class="benchmark-bar"><div class="benchmark-fill ${result.benchmark.dimensionComparisons.cultureInnovation.status}" style="width: ${result.benchmark.dimensionComparisons.cultureInnovation.company}%;"></div></div></td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">Comunicação</td>
+                        <td><strong>${result.benchmark.dimensionComparisons.communication.company}</strong></td>
+                        <td>${result.benchmark.dimensionComparisons.communication.sectorAvg}</td>
+                        <td class="${result.benchmark.dimensionComparisons.communication.gap > 0 ? 'gap-good' : result.benchmark.dimensionComparisons.communication.gap < -10 ? 'gap-high' : ''}">${result.benchmark.dimensionComparisons.communication.gap > 0 ? '+' : ''}${result.benchmark.dimensionComparisons.communication.gap}</td>
+                        <td><div class="benchmark-bar"><div class="benchmark-fill ${result.benchmark.dimensionComparisons.communication.status}" style="width: ${result.benchmark.dimensionComparisons.communication.company}%;"></div></div></td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">Transformação Digital</td>
+                        <td><strong>${result.benchmark.dimensionComparisons.transformation.company}</strong></td>
+                        <td>${result.benchmark.dimensionComparisons.transformation.sectorAvg}</td>
+                        <td class="${result.benchmark.dimensionComparisons.transformation.gap > 0 ? 'gap-good' : result.benchmark.dimensionComparisons.transformation.gap < -10 ? 'gap-high' : ''}">${result.benchmark.dimensionComparisons.transformation.gap > 0 ? '+' : ''}${result.benchmark.dimensionComparisons.transformation.gap}</td>
+                        <td><div class="benchmark-bar"><div class="benchmark-fill ${result.benchmark.dimensionComparisons.transformation.status}" style="width: ${result.benchmark.dimensionComparisons.transformation.company}%;"></div></div></td>
+                    </tr>
+                </tbody>
+            </table>
+            ${result.benchmark.leaders && result.benchmark.leaders.length > 0 ? `
+            <div style="margin-top: 20px;">
+                <p style="color: var(--gray); font-size: 0.9rem; margin-bottom: 10px;">Líderes do setor para referência:</p>
+                <div class="leader-list">
+                    ${result.benchmark.leaders.map(l => `<span class="leader-tag">${l}</span>`).join('')}
+                </div>
+            </div>
+            ` : ''}
+            ${result.benchmark.recommendations && result.benchmark.recommendations.length > 0 ? `
+            <div style="margin-top: 20px; padding: 15px; background: var(--light); border-radius: 8px;">
+                <h4 style="color: var(--primary); margin-bottom: 10px;">Prioridades para追赶 Setorial</h4>
+                ${result.benchmark.recommendations.map(r => `
+                    <div style="margin-bottom: 10px;">
+                        <strong style="color: var(--danger);">${r.dimension}:</strong> ${r.action}
+                    </div>
+                `).join('')}
+            </div>
+            ` : ''}
+        </section>
+        ` : ''}
 
         <section class="card">
             <h2>Detalhamento por Dimensão</h2>
