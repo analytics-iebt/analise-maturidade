@@ -329,59 +329,236 @@ function identifyBusinessType(analysis) {
     analysis.description || '',
     ...(analysis.headings || []),
     ...(analysis.navLinks || []),
-    ...(analysis.footerLinks || [])
+    ...(analysis.footerLinks || []),
+    (analysis.mainContent || '').substring(0, 5000)
   ].join(' ').toLowerCase();
 
-  const patterns = [
-    { negocio: 'Associação/Entidade', keywords: ['associação', 'associacao', 'cdl', 'federac', 'federacao', 'sindicato', 'câmara', 'camara', 'confederação', 'conselho', 'sesi', 'senai', 'sebrae', 'fecomério', 'acsp', 'acie', 'acium'], weight: 15 },
-    { negocio: 'Restaurante', keywords: ['cardápio', 'prato', 'chef', 'gastronomia', 'lanchonete', 'pizzaria', 'hamburgueria', 'bar e restaurante', 'comida caseira', 'delivery de comida', 'ifood', 'restaurante self-service', 'comida a kilo', 'bufê'], weight: 10 },
-    { negocio: 'Academia', keywords: ['academia', 'musculação', 'ginástica', 'crossfit', 'spinning', 'pilates', 'yoga', 'fitness', 'fit ', 'musculação e fitness', 'studio de pilates', 'academia de ginástica', 'fitness club', 'smart fit', 'bio ritmo', 'gold\'s gym'], weight: 12 },
-    { negocio: 'Clínica Médica', keywords: ['consultório médico', 'clínica médica', 'atendimento médico', 'médico', 'saúde', 'exames laboratoriais', 'laboratório', 'diagnóstico', 'atendimento clínico', 'clínica de saúde'], weight: 10 },
-    { negocio: 'Farmácia', keywords: ['farmácia', 'drogaria', 'medicamentos', 'remédios', 'manipulação', 'fitoterápicos'], weight: 10 },
-    { negocio: 'Educação', keywords: ['universidade', 'faculdade', 'ensino superior', 'graduação', 'pós-graduação', 'ead', 'colégio', 'escola', 'cursinho'], weight: 8 },
-    { negocio: 'Advocacia', keywords: ['escritório de advocacia', 'advogado', 'advocacia', 'tribunal', 'causa', 'direito', 'advocacia e consultoria'], weight: 10 },
-    { negocio: 'Contabilidade', keywords: ['escritório contábil', 'contabilidade', 'sped', 'departamento fiscal', 'assessoria contábil'], weight: 10 },
-    { negocio: 'Imobiliária', keywords: ['imobiliária', 'venda de imóveis', 'aluguel de imóvel', 'apartamentos à venda', 'casas à venda', 'corretora de imóveis', 'imóveis para'], weight: 10 },
-    { negocio: 'Pet Shop', keywords: ['pet shop', 'petz', 'petshop', 'veterinário', 'veterinária', 'banho e tosa', 'ração', 'clínica veterinária', 'pets', 'cachorro', 'gato', 'animal de estimação', 'cobasi'], weight: 12 },
-    { negocio: 'Beleza/Salão', keywords: ['salão de beleza', 'cabelo', 'manicure', 'pedicure', 'estética', 'maquiagem', 'corte de cabelo', 'escova', 'coloração', 'tratamento capilar'], weight: 10 },
-    { negocio: 'Odontologia', keywords: ['dentista', 'odontologia', 'implante dentário', 'tratamento odontológico', 'clínica odontológica', 'ortodontia'], weight: 10 },
-    { negocio: 'Autos', keywords: ['concessionária', 'veículos', 'automóveis', 'carros novos', 'carros usados', 'motos', 'seminovos'], weight: 8 },
-    { negocio: 'Construção/Reformas', keywords: ['construção civil', 'reformas', 'arquitetura', 'projeto arquitetônico', 'obra', 'projetos', 'projetos e execução'], weight: 8 },
-    { negocio: 'Moda/Roupas', keywords: ['loja de roupas', 'moda feminina', 'moda masculina', 'boutique', 'vestuário', 'confecção'], weight: 8 },
-    { negocio: 'Hotel/Pousada', keywords: ['hotel', 'pousada', 'resort', 'hospedagem', 'reserva de quarto', 'chalé', 'hostel'], weight: 10 },
-    { negocio: 'Turismo', keywords: ['agência de turismo', 'passagens aéreas', 'pacotes turísticos', 'viagens', 'turismo', 'viagens e turismo'], weight: 10 },
-    { negocio: 'Logística', keywords: ['transportadora', 'frete', 'entrega de carga', 'logística', 'mudanças', 'armazenagem'], weight: 10 },
-    { negocio: 'Tecnologia/Software', keywords: ['desenvolvimento de software', 'sistema personalizado', 'programação', 'dev', 'app sob medida', 'soluções tecnológicas', 'ti ', ' tecnologia da informação'], weight: 8 },
-    { negocio: 'Financeiro', keywords: ['banco', 'fintech', 'crédito', 'investimentos', 'finanças', 'corretora de seguros', 'seguradora'], weight: 8 },
-    { negocio: 'Varejo', keywords: ['supermercado', 'atacarejo', 'mercadinho', 'loja física', 'autosserviço', 'hipermercado'], weight: 8 },
-    { negocio: 'E-commerce', keywords: ['loja virtual', 'comprar online', 'carrinho de compras', 'e-commerce', 'compre online'], weight: 8 },
-    { negocio: 'Eventos', keywords: ['buffet para festas', 'espaço para eventos', 'festa de casamento', 'festa deformatura', 'buffet', 'eventos e fest'], weight: 10 },
-    { negocio: 'Barbearia', keywords: ['barbearia', 'barbeiro', 'corte masculino', 'barba', 'navalha'], weight: 10 },
-    { negocio: 'Oficina Mecânica', keywords: ['oficina mecânica', 'mecânica', 'auto mecânica', 'funilaria', 'pintura'], weight: 10 },
-    { negocio: 'Lavanderia', keywords: ['lavanderia', 'lavanderia self-service', 'lavagem de roupas', 'tinturaria'], weight: 10 },
-    { negocio: 'Prestador de Serviços', keywords: ['prestador de serviços', 'prestação de serviços', 'serviços gerais'], weight: 5 }
-  ];
+  const serviceCategories = {
+    'Associação/Entidade': {
+      keywords: ['associação', 'associacao', 'cdl', 'federac', 'federacao', 'sindicato', 'câmara', 'camara', 'confederação', 'conselho', 'sesi', 'senai', 'sebrae', 'fecomério', 'acsp', 'acie', 'acium', 'classe', 'empresa associado', 'representação comercial'],
+      description: 'Associação ou entidade de classe'
+    },
+    'Restaurante': {
+      keywords: ['cardápio', 'prato', 'chef', 'gastronomia', 'lanchonete', 'pizzaria', 'hamburgueria', 'bar e restaurante', 'comida caseira', 'delivery de comida', 'bufê', 'self-service', 'comida a kilo', 'restaurante'],
+      description: 'Restaurante ou serviço de alimentação'
+    },
+    'Academia': {
+      keywords: ['academia', 'musculação', 'ginástica', 'crossfit', 'spinning', 'pilates', 'yoga', 'fitness', 'fit', 'studio de pilates', 'academia de ginástica', 'fitness club'],
+      description: 'Academia de ginástica ou fitness'
+    },
+    'Clínica Médica': {
+      keywords: ['consultório médico', 'clínica médica', 'atendimento médico', 'médico', 'saúde', 'exames laboratoriais', 'laboratório', 'diagnóstico', 'atendimento clínico', 'clínica de saúde', 'hospital'],
+      description: 'Clínica médica ou hospital'
+    },
+    'Farmácia': {
+      keywords: ['farmácia', 'drogaria', 'medicamentos', 'remédios', 'manipulação', 'fitoterápicos', 'dermocosmético'],
+      description: 'Farmácia ou drogaria'
+    },
+    'Educação': {
+      keywords: ['universidade', 'faculdade', 'ensino superior', 'graduação', 'pós-graduação', 'ead', 'colégio', 'escola', 'cursinho', 'curso', 'treinamento', 'certificação'],
+      description: 'Instituição de educação ou cursos'
+    },
+    'Advocacia': {
+      keywords: ['escritório de advocacia', 'advogado', 'advocacia', 'tribunal', 'causa', 'direito', 'advocacia e consultoria', 'jurídico'],
+      description: 'Escritório de advocacia'
+    },
+    'Contabilidade': {
+      keywords: ['escritório contábil', 'contabilidade', 'sped', 'departamento fiscal', 'assessoria contábil', 'contador'],
+      description: 'Escritório de contabilidade'
+    },
+    'Imobiliária': {
+      keywords: ['imobiliária', 'venda de imóveis', 'aluguel de imóvel', 'apartamentos à venda', 'casas à venda', 'corretora de imóveis', 'imóveis para', 'incorporadora'],
+      description: 'Imobiliária ou corretora de imóveis'
+    },
+    'Pet Shop': {
+      keywords: ['pet shop', 'petz', 'petshop', 'veterinário', 'veterinária', 'banho e tosa', 'ração', 'clínica veterinária', 'pets', 'cachorro', 'gato', 'animal de estimação', 'cobasi'],
+      description: 'Pet shop ou clínica veterinária'
+    },
+    'Beleza/Salão': {
+      keywords: ['salão de beleza', 'cabelo', 'manicure', 'pedicure', 'estética', 'maquiagem', 'corte de cabelo', 'escova', 'coloração', 'tratamento capilar', 'esteticista'],
+      description: 'Salão de beleza ou estética'
+    },
+    'Odontologia': {
+      keywords: ['dentista', 'odontologia', 'implante dentário', 'tratamento odontológico', 'clínica odontológica', 'ortodontia', 'prótese dentária'],
+      description: 'Clínica odontológica'
+    },
+    'Autos': {
+      keywords: ['concessionária', 'veículos', 'automóveis', 'carros novos', 'carros usados', 'motos', 'seminovos', 'revisão', 'mecânica'],
+      description: 'Concessionária ou loja de veículos'
+    },
+    'Construção/Reformas': {
+      keywords: ['construção civil', 'reformas', 'arquitetura', 'projeto arquitetônico', 'obra', 'projetos', 'projetos e execução', 'engenharia'],
+      description: 'Empresa de construção ou reformas'
+    },
+    'Moda/Roupas': {
+      keywords: ['loja de roupas', 'moda feminina', 'moda masculina', 'boutique', 'vestuário', 'confecção', 'atacado de roupas'],
+      description: 'Loja de roupas ou moda'
+    },
+    'Hotel/Pousada': {
+      keywords: ['hotel', 'pousada', 'resort', 'hospedagem', 'reserva de quarto', 'chalé', 'hostel', 'flat', 'apart hotel'],
+      description: 'Hotel, pousada ou hospedagem'
+    },
+    'Turismo': {
+      keywords: ['agência de turismo', 'passagens aéreas', 'pacotes turísticos', 'viagens', 'turismo', 'viagens e turismo', 'excursão'],
+      description: 'Agência de turismo'
+    },
+    'Logística': {
+      keywords: ['transportadora', 'frete', 'entrega de carga', 'logística', 'mudanças', 'armazenagem', 'estoque', 'supply chain'],
+      description: 'Empresa de logística ou transporte'
+    },
+    'Desenvolvimento de Software': {
+      keywords: ['desenvolvimento de software', 'sistema personalizado', 'programação', 'dev', 'app sob medida', 'soluções tecnológicas', 'ti', 'tecnologia da informação', 'plataforma', 'software como serviço', 'criação de sistemas'],
+      description: 'Desenvolvimento de software personalizado'
+    },
+    'Consultoria em Tecnologia': {
+      keywords: ['consultoria tecnológica', 'consultoria em ti', 'estratégia digital', 'roadmap tecnológico', 'arquitetura de sistemas', 'consultoria de tecnologia'],
+      description: 'Consultoria em tecnologia'
+    },
+    'Inteligência Artificial': {
+      keywords: ['inteligência artificial', 'ia', 'machine learning', 'deep learning', 'chatbot', 'automação', 'processos automatizados', 'nlp', 'visão computacional', 'data science', 'analytics'],
+      description: 'Empresa de inteligência artificial e automação'
+    },
+    'Marketing Digital': {
+      keywords: ['marketing digital', 'tráfego pago', 'seo', 'mídia digital', 'publicidade digital', 'gestão de mídias', 'social media', 'conteúdo digital'],
+      description: 'Agência de marketing digital'
+    },
+    'Financeiro': {
+      keywords: ['banco', 'fintech', 'crédito', 'investimentos', 'finanças', 'corretora de seguros', 'seguradora', 'assessoria financeira', 'gestão de patrimônio'],
+      description: 'Instituição financeira ou fintech'
+    },
+    'Varejo': {
+      keywords: ['supermercado', 'atacarejo', 'mercadinho', 'loja física', 'autosserviço', 'hipermercado', 'atacado'],
+      description: 'Varejo físico'
+    },
+    'E-commerce': {
+      keywords: ['loja virtual', 'comprar online', 'carrinho de compras', 'e-commerce', 'compre online', 'loja online', 'marketplace'],
+      description: 'Loja de e-commerce'
+    },
+    'Eventos': {
+      keywords: ['buffet para festas', 'espaço para eventos', 'festa de casamento', 'festa deformatura', 'buffet', 'eventos e fest', 'organização de eventos'],
+      description: 'Buffet ou empresa de eventos'
+    },
+    'Barbearia': {
+      keywords: ['barbearia', 'barbeiro', 'corte masculino', 'barba', 'navalha', 'barbeiro'],
+      description: 'Barbearia'
+    },
+    'Oficina Mecânica': {
+      keywords: ['oficina mecânica', 'mecânica', 'auto mecânica', 'funilaria', 'pintura', 'revisão veicular'],
+      description: 'Oficina mecânica'
+    },
+    'Lavanderia': {
+      keywords: ['lavanderia', 'lavanderia self-service', 'lavagem de roupas', 'tinturaria', 'lavar roupas'],
+      description: 'Lavanderia'
+    },
+    'Consultoria de Inovação': {
+      keywords: ['consultoria de inovação', 'inovação tecnológica', 'transformação digital', 'estratégia de inovação', 'projetos de inovação', 'laboratório de inovação', 'open innovation', 'innovation lab', 'design thinking', 'agile', 'lean startup', 'intrapreneurship'],
+      description: 'Consultoria em inovação'
+    },
+    'Inovação e Transformação Digital': {
+      keywords: ['transformação digital', 'mudança organizacional', 'cultura de inovação', 'processos inovadores', 'nova geração', 'futuro das organizações', 'inovação aberta'],
+      description: 'Inovação e transformação digital para organizações'
+    },
+    'Prestador de Serviços': {
+      keywords: ['prestador de serviços', 'prestação de serviços', 'serviços gerais', 'atendimento', 'soluções'],
+      description: 'Prestador de serviços gerais'
+    }
+  };
 
-  let bestMatch = { negocio: 'Prestador de Serviços', score: 0 };
+  const scores = [];
   
-  for (const pattern of patterns) {
+  const primaryCategories = {
+    'Academia': ['academia', 'musculação', 'ginástica', 'crossfit', 'spinning', 'pilates', 'yoga', 'fitness'],
+    'Restaurante': ['cardápio', 'restaurante', 'bufê', 'gastronomia', 'self-service'],
+    'Associação/Entidade': ['associação', 'cdl', 'federac', 'sindicato', 'câmara', 'confederação', 'sebrae', 'sesi', 'senai'],
+    'Clínica Médica': ['hospital', 'clínica médica', 'atendimento médico', 'médico', 'saúde'],
+    'Farmácia': ['farmácia', 'drogaria', 'medicamentos', 'remédios'],
+    'Pet Shop': ['pet shop', 'petshop', 'veterinário', 'clínica veterinária', 'petz', 'cobasi'],
+    'Beleza/Salão': ['salão de beleza', 'manicure', 'estética', 'cabelo'],
+    'Odontologia': ['dentista', 'odontologia', 'implante dentário', 'ortodontia'],
+    'Advocacia': ['escritório de advocacia', 'advogado', 'advocacia', 'jurídico'],
+    'Educação': ['universidade', 'faculdade', 'colégio', 'escola', 'graduação'],
+    'Imobiliária': ['imobiliária', 'apartamentos à venda', 'casas à venda', 'corretora de imóveis'],
+    'Autos': ['concessionária', 'veículos', 'automóveis', 'seminovos'],
+    'E-commerce': ['loja virtual', 'e-commerce', 'comprar online', 'carrinho de compras'],
+    'Hotel/Pousada': ['hotel', 'pousada', 'resort', 'hospedagem'],
+    'Turismo': ['agência de turismo', 'pacotes turísticos', 'viagens'],
+    'Logística': ['transportadora', 'frete', 'logística'],
+    'Marketing Digital': ['marketing digital', 'tráfego pago', 'seo', 'mídia digital'],
+    'Barbearia': ['barbearia', 'barbeiro', 'corte masculino'],
+    'Lavanderia': ['lavanderia', 'lavanderia self-service'],
+    'Oficina Mecânica': ['oficina mecânica', 'funilaria', 'pintura'],
+    'Inteligência Artificial': ['inteligência artificial', 'ia e dados', 'machine learning', 'deep learning', 'chatbot', 'automação'],
+    'Inovação e Transformação Digital': ['transformação digital', 'futuro das organizações', 'inovação', 'laboratório de inovação', 'cultura de inovação']
+  };
+  
+  for (const [category, data] of Object.entries(serviceCategories)) {
     let matchCount = 0;
-    for (const keyword of pattern.keywords) {
+    const matchedKeywords = [];
+    
+    for (const keyword of data.keywords) {
       if (allText.includes(keyword)) {
-        matchCount += pattern.weight;
+        matchCount++;
+        matchedKeywords.push(keyword);
       }
     }
-    if (matchCount > bestMatch.score) {
-      bestMatch = { negocio: pattern.negocio, score: matchCount };
+    
+    if (matchCount > 0) {
+      scores.push({
+        category,
+        score: matchCount,
+        matchedKeywords,
+        description: data.description,
+        isPrimary: primaryCategories[category] ? true : false
+      });
     }
   }
 
-  console.log(`[Business] Melhor match: ${bestMatch.negocio} (score: ${bestMatch.score})`);
+  scores.sort((a, b) => {
+    if (a.isPrimary && !b.isPrimary && a.score >= b.score - 2) return -1;
+    if (b.isPrimary && !a.isPrimary && b.score >= a.score - 2) return 1;
+    return b.score - a.score;
+  });
+
+  const topMatch = scores[0] || { category: 'Prestador de Serviços', score: 0, description: 'Prestador de serviços gerais', matchedKeywords: [] };
+
+  const identifiedServices = [...new Set(topMatch.matchedKeywords.map(k => k.toLowerCase()))].slice(0, 5);
+  
+  console.log(`[Business] Tipo identificado: ${topMatch.category}`);
+  console.log(`[Business] Descrição: ${topMatch.description}`);
+  console.log(`[Business] Keywords encontradas: ${topMatch.matchedKeywords.join(', ')}`);
+  console.log(`[Business] Top 3 matches:`, scores.slice(0, 3).map(s => `${s.category}(${s.score})`).join(', '));
 
   return {
-    tipo: bestMatch.negocio,
-    score: bestMatch.score
+    tipo: topMatch.category,
+    score: topMatch.score,
+    description: topMatch.description,
+    services: identifiedServices,
+    allMatches: scores.slice(0, 5),
+    title: analysis.title,
+    valueProposition: extractValueProposition(analysis)
   };
+}
+
+function extractValueProposition(analysis) {
+  const headings = analysis.headings || [];
+  const mainContent = analysis.mainContent || '';
+  
+  const valueKeywords = ['missão', 'visão', 'valores', 'proposta', 'solução', 'benefício', 'diferencial', 'propósito'];
+  
+  for (const heading of headings.slice(0, 10)) {
+    const lowerHeading = heading.toLowerCase();
+    for (const keyword of valueKeywords) {
+      if (lowerHeading.includes(keyword)) {
+        return heading;
+      }
+    }
+  }
+  
+  if (analysis.description) {
+    return analysis.description;
+  }
+  
+  return headings[0] || '';
 }
 
 function analyzeProductsAndServices(analysis) {
@@ -391,39 +568,42 @@ function analyzeProductsAndServices(analysis) {
     ...(analysis.headings || []),
     ...(analysis.navLinks || []),
     ...(analysis.footerLinks || []),
-    analysis.mainContent || ''
+    (analysis.mainContent || '').substring(0, 10000)
   ].join(' ').toLowerCase();
 
   const negocioCompetitors = {
-    'Associação/Entidade': { principais: ['FECOMÉRCIO', 'CNC', 'ACSP', ' CDL BH', 'Sebrae', 'SENAI', 'SESI'], regional: ['CDL São Paulo', 'ACIEB', 'ACIM', 'ACIC'], similares: ['SINDICATO', 'Federações Regionais'] },
-    'Restaurante': { principais: ['MC Donalds', 'Burger King', 'Subway', 'Pizza Hut'], regional: ['Chopp Brahma', 'Habibs', 'Giraffas', 'Bobs', 'KFC'], similares: ['Outback', 'Applebees', 'Vea', 'Spoleto'] },
-    'Academia': { principais: ['Smart Fit', 'Bio Ritmo', 'Gold\'s Gym'], regional: ['Academia Forma', 'Blue Fit', 'Power Fit'], similares: ['CrossFit', 'Curves', 'Smart Fit Low'] },
-    'Clínica Médica': { principais: ['Albert Einstein', 'Sirio-Libanes', 'Oswaldo Cruz'], regional: ['Fleury', 'DASA', 'Diagnóstico por Imagem'], similares: ['Lavoisier', 'A+', 'CDB'] },
-    'Farmácia': { principais: ['Drogaria São Paulo', 'Drogarias Extra', 'Raia'], regional: ['Drogasil', 'Pague Menos', 'Ultrafarma'], similares: ['Onofre', 'Drogaria Venâncio'] },
-    'Educação': { principais: ['Anhanguera', 'Estácio', 'Pitágoras'], regional: ['Unopar', 'UNIP', 'UniFIJ'], similares: ['Coursera', 'Alura', 'Descomplica'] },
-    'Advocacia': { principais: ['TozziniFreire', 'Mattos Filho', 'Mendes Kaufmann'], regional: ['Levy & Partners', 'Cascione'], similares: ['Siqueira e Castro', 'Baraldi'] },
-    'Contabilidade': { principais: ['Contabilizei', 'Contabilidade App'], regional: ['Contabil', 'Nexcore', 'Confere'], similares: ['Contador Online', 'Guia Contábil'] },
-    'Imobiliária': { principais: ['Loft', 'Viva Real', 'Zap Imóveis'], regional: ['Lopes', 'Fernandes', 'Cyrela'], similares: ['MRV', 'Tenda', 'Eztec'] },
-    'Pet Shop': { principais: ['Petlove', 'Petz', 'Cobasi'], regional: ['Pet Center', 'Petland'], similares: ['Cãobeira', 'Amigo Fiel'] },
-    'Beleza/Salão': { principais: ['Beleza Natural'], regional: ['Espaço Beauty', 'Studio W'], similares: ['Hair Studio', 'Salão da Kate'] },
-    'Odontologia': { principais: ['Orthodontic', 'Implante'], regional: ['Sorriden', 'Implart'], similares: ['CIO', 'Dental'] },
-    'Autos': { principais: ['Volkswagen', 'Toyota', 'Ford', 'Chevrolet'], regional: ['Honda', 'Fiat', 'BYD'], similares: ['CAOA', 'Lokam'] },
-    'Construção/Reformas': { principais: ['C&C', 'Leroy Merlin'], regional: ['Makro', 'Casa & Construção'], similares: ['Ponto das Telhas'] },
-    'Moda/Roupas': { principais: ['Renner', 'C&A', 'Riachuelo'], regional: ['Marisa', 'Lojas Renner'], similares: ['Nike', 'Adidas', 'Zattini'] },
-    'Hotel/Pousada': { principais: ['Accor', 'Marriott', 'Hilton'], regional: ['Ibis', 'Holiday Inn'], similares: ['Airbnb', 'Booking.com'] },
-    'Turismo': { principais: ['CVC', 'Decolar', 'Viagens Combo'], regional: ['Submarino Viagens'], similares: ['Booking', 'Airbnb'] },
-    'Logística': { principais: ['iFood', 'Lalamove', 'Loggi'], regional: ['Intelipost', 'Jadlog'], similares: ['Azul Cargo'] },
-    'Marketing Digital': { principais: ['Rock Content', 'Resultados Digitais'], regional: ['RD Station', 'Youpage'], similares: ['HubSpot', 'Mauá Digital'] },
-    'Tecnologia/Software': { principais: ['Totvs', 'SAP', 'Oracle'], regional: ['Locaweb', 'Vindi'], similares: ['RD Station', 'Pagar.me'] },
-    'Consultoria': { principais: ['Accenture', 'Deloitte', 'McKinsey'], regional: ['Bain', 'KPMG'], similares: ['EY', 'PwC'] },
-    'Financeiro': { principais: ['Nubank', 'C6 Bank', 'Inter'], regional: ['PicPay', 'PagSeguro'], similares: ['Mercado Pago'] },
-    'Varejo': { principais: ['Magazine Luiza', 'Americanas', 'Casas Bahia'], regional: ['Ponto Frio', 'Shoptime'], similares: ['Amazon', 'Shopee'] },
-    'E-commerce': { principais: ['Shopee', 'Mercado Livre', 'Amazon Brasil'], regional: ['Magazine Luiza', 'Americanas'], similares: ['Shopify', 'VTEX', 'Nuvemshop'] },
-    'Eventos': { principais: ['Buffet'], regional: ['Espaço para eventos'], similares: ['Buffet infantil'] },
-    'Fitness': { principais: ['Smart Fit', 'Bio Ritmo'], regional: ['Blue Fit', 'Power Fit'], similares: ['CrossFit'] },
-    'Barbearia': { principais: ['Barber Shop', 'Imperial Barber'], regional: ['Barbearia do Bairro'], similares: ['Big Boss Barber', 'Old Town Barber'] },
-    'Oficina Mecânica': { principais: ['Volkswagen', 'Toyota', 'Ford'], regional: ['Honda', 'Fiat'], similares: ['CAOA', 'Localiza'] },
-    'Lavanderia': { principais: ['Lavanderia 5àsec', 'Lavanderia drop'], regional: ['Lavanderia Express'], similares: ['Lavanderia Self Service'] },
+    'Associação/Entidade': { principais: ['FECOMÉRCIO', 'CNC', 'ACSP', 'CDL BH', 'Sebrae', 'SENAI', 'SESI'], regionais: ['CDL São Paulo', 'ACIEB', 'ACIM', 'ACIC'], similares: ['Sindicatos Regionais', 'Federações'] },
+    'Restaurante': { principais: ['McDonalds', 'Burger King', 'Subway', 'Pizza Hut', 'Habibs'], regionais: ['Chopp Brahma', 'Giraffas', 'Bobs', 'KFC', 'Outback'], similares: ['Applebees', 'Vea', 'Spoleto'] },
+    'Academia': { principais: ['Smart Fit', 'Bio Ritmo', 'Gold\'s Gym'], regionais: ['Blue Fit', 'Power Fit', 'Curves'], similares: ['CrossFit', 'Academia Local'] },
+    'Clínica Médica': { principais: ['Hospital Albert Einstein', 'Sírio-Libanês', 'Oswaldo Cruz'], regionais: ['Fleury', 'DASA', 'Diagnóstico por Imagem'], similares: ['Lavoisier', 'A+', 'CDB'] },
+    'Farmácia': { principais: ['Drogaria São Paulo', 'Drogarias Extra', 'Raia Drogasil'], regionais: ['Drogasil', 'Pague Menos', 'Ultrafarma'], similares: ['Drogaria Local'] },
+    'Educação': { principais: ['Anhanguera', 'Estácio', 'Pitágoras', 'UniNassau'], regionais: ['Unopar', 'UNIP', 'UniFIJ', 'UNOPAR'], similares: ['Coursera', 'Alura', 'Descomplica'] },
+    'Advocacia': { principais: ['TozziniFreire', 'Mattos Filho', 'Mendes Kaufmann'], regionais: ['Levy & Partners', 'Cascione'], similares: ['Escritório Local'] },
+    'Contabilidade': { principais: ['Contabilizei', 'Contabilidade App'], regionais: ['Contabil', 'Nexcore', 'Confere'], similares: ['Escritório Local'] },
+    'Imobiliária': { principais: ['Lopes', 'Viva Real', 'Zap Imóveis', 'Loft'], regionais: ['Fernandes', 'Cyrela', 'MRV'], similares: ['Imobiliária Local'] },
+    'Pet Shop': { principais: ['Petz', 'Cobasi', 'Petlove'], regionais: ['Pet Center', 'Petland', 'Cãobeira'], similares: ['Pet Shop Local'] },
+    'Beleza/Salão': { principais: ['Beleza Natural', 'Instituto Embelleze'], regionais: ['Espaço Beauty', 'Studio W'], similares: ['Salão Local'] },
+    'Odontologia': { principais: ['Orthodontic', 'Implante', 'Sorriden'], regionais: ['CIO', 'Dental', 'Implart'], similares: ['Clínica Local'] },
+    'Autos': { principais: ['Volkswagen', 'Toyota', 'Ford', 'Chevrolet'], regionais: ['Honda', 'Fiat', 'BYD', 'CAOA'], similares: ['Concessionária Local'] },
+    'Construção/Reformas': { principais: ['C&C', 'Leroy Merlin'], regionais: ['Makro', 'Casa & Construção'], similares: ['Construtora Local'] },
+    'Moda/Roupas': { principais: ['Renner', 'C&A', 'Riachuelo', 'Marisa'], regionais: ['Marisa', 'Lojas Renner'], similares: ['Nike', 'Adidas', 'Zattini'] },
+    'Hotel/Pousada': { principais: ['Accor', 'Marriott', 'Hilton'], regionais: ['Ibis', 'Holiday Inn'], similares: ['Airbnb', 'Pousada Local'] },
+    'Turismo': { principais: ['CVC', 'Decolar', 'Viagens Combo'], regionais: ['Submarino Viagens'], similares: ['Booking', 'Airbnb'] },
+    'Logística': { principais: ['iFood', 'Lalamove', 'Loggi'], regionais: ['Intelipost', 'Jadlog'], similares: ['Azul Cargo', 'Transportadora Local'] },
+    'Marketing Digital': { principais: ['Rock Content', 'Resultados Digitais', 'Youpage'], regionais: ['RD Station', 'Mauá Digital'], similares: ['Agência Local'] },
+    'Desenvolvimento de Software': { principais: ['TOTVS', 'Locaweb', 'Softvar'], regionais: ['Vindi', 'Pagar.me', 'iugu'], similares: ['Agência de Desenvolvimento Local'] },
+    'Consultoria em Tecnologia': { principais: ['Accenture', 'Deloitte Digital', 'Tivit'], regionais: ['Prodigious', 'Linikin'], similares: ['Consultoria Local'] },
+    'Inteligência Artificial': { principais: ['Accenture AI', 'IBM Watson', 'DataRobot'], regionais: ['Qranio', 'Stacking'], similares: ['Startup de IA Local'] },
+    'Consultoria de Inovação': { principais: ['FC.NOVAS', 'Bosso Digital', 'Future Minds'], regionais: ['Lunier Innovation', 'Think en', 'Nidus Lab'], similares: ['Consultoria Local de Inovação'] },
+    'Inovação e Transformação Digital': { principais: ['Accenture', 'Deloitte', 'McKinsey Digital'], regionais: ['TNT', 'Quantic'], similares: ['Consultoria de Transformação Local'] },
+    'Financeiro': { principais: ['Nubank', 'C6 Bank', 'Inter', 'PicPay'], regionais: ['PagSeguro', 'Mercado Pago'], similares: ['Banco Local'] },
+    'Varejo': { principais: ['Magazine Luiza', 'Americanas', 'Casas Bahia'], regionais: ['Ponto Frio', 'Shoptime'], similares: ['Amazon', 'Shopee'] },
+    'E-commerce': { principais: ['Shopee', 'Mercado Livre', 'Amazon Brasil'], regionais: ['Magazine Luiza', 'Americanas'], similares: ['Shopify', 'VTEX', 'Nuvemshop'] },
+    'Eventos': { principais: ['Buffet Premium'], regionais: ['Espaço para Eventos Local'], similares: ['Buffet Local'] },
+    'Fitness': { principais: ['Smart Fit', 'Bio Ritmo'], regionais: ['Blue Fit', 'Power Fit'], similares: ['CrossFit'] },
+    'Barbearia': { principais: ['Barber Shop'], regionais: ['Barbearia do Bairro'], similares: ['Barbearia Local'] },
+    'Oficina Mecânica': { principais: ['Auto Center Local'], regionais: ['Funilaria Local'], similares: ['Mecânica Local'] },
+    'Lavanderia': { principais: ['Lavanderia 5àsec'], regionais: ['Lavanderia Express'], similares: ['Lavanderia Local'] },
     'Prestador de Serviços': { principais: ['SERASA', 'Sebrae'], regional: ['SENAI', 'SESC'], similares: ['Prestadores Regionais'] }
   };
 
@@ -449,23 +629,71 @@ function analyzeProductsAndServices(analysis) {
     }
   }
 
-  const negocioInfo = negocioCompetitors[businessType.tipo] || negocioCompetitors['Varejo'];
-  const todosConcorrentes = [...(negocioInfo.principais || []), ...(negocioInfo.regionais || []), ...(negocioInfo.similares || [])];
+  const negocioInfo = negocioCompetitors[businessType.tipo] || negocioCompetitors['Prestador de Serviços'];
+  
+  const servicosEspecificos = extractSpecificServices(allText, businessType);
+  const todosConcorrentes = [
+    ...(negocioInfo.principais || []),
+    ...(negocioInfo.regionais || []),
+    ...(negocioInfo.similares || [])
+  ].filter(c => c);
 
-  console.log(`[Products] Negócio identificado: ${businessType.tipo} (score: ${businessType.score})`);
-  console.log(`[Products] Concorrentes: ${todosConcorrentes.join(', ')}`);
+  console.log(`[Products] Tipo identificado: ${businessType.tipo}`);
+  console.log(`[Products] Descrição: ${businessType.description}`);
+  console.log(`[Products] Serviços específicos: ${servicosEspecificos.join(', ')}`);
+  console.log(`[Products] Concorrentes: ${todosConcorrentes.slice(0, 5).join(', ')}`);
 
   return {
     tipo: businessType.tipo,
+    description: businessType.description,
     score: businessType.score,
+    services: businessType.services,
+    allMatches: businessType.allMatches,
+    title: businessType.title,
+    valueProposition: businessType.valueProposition,
+    specificServices: servicosEspecificos,
     servicos: servicosDetectados,
     negocios: [{
       tipo: businessType.tipo,
-      concorrentes: todosConcorrentes
+      description: businessType.description,
+      concorrentes: todosConcorrentes,
+      concorrentesPrincipais: negocioInfo.principais || [],
+      concorrentesRegionais: negocioInfo.regionais || [],
+      concorrentesSimilares: negocioInfo.similares || []
     }],
     produtos: [],
     categorias: []
   };
+}
+
+function extractSpecificServices(text, businessType) {
+  const services = [];
+  
+  const servicePatterns = {
+    'AI e Machine Learning': ['machine learning', 'deep learning', 'ia ', 'inteligência artificial', 'chatbot', 'nlp', 'visão computacional', 'data science', 'ml'],
+    'Análise de Dados': ['analytics', 'bi', 'business intelligence', 'dashboard', 'big data', 'dados', 'reporting'],
+    'Automação': ['automação', 'automacao', 'rpa', 'workflow', 'processos automatizados', 'bot'],
+    'Desenvolvimento Web': ['site', 'website', 'web', 'landing page', 'front-end', 'back-end', 'fullstack'],
+    'Aplicativos': ['app', 'aplicativo', 'mobile', 'ios', 'android', 'react native', 'flutter'],
+    'Cloud': ['cloud', 'nuvem', 'aws', 'azure', 'gcp', 'heroku', 'hosting'],
+    'E-commerce': ['e-commerce', 'loja virtual', 'carrinho', 'pagamento digital', ' checkout'],
+    'Marketing Digital': ['marketing digital', 'seo', 'tráfego', 'redes sociais', 'conteúdo', 'social media'],
+    'Consultoria': ['consultoria', 'assessoria', 'estratégia', 'planejamento', 'roadmap'],
+    'Treinamento': ['treinamento', 'capacitação', 'workshop', 'curso', 'certificação']
+  };
+  
+  for (const [service, keywords] of Object.entries(servicePatterns)) {
+    for (const kw of keywords) {
+      if (text.includes(kw)) {
+        if (!services.includes(service)) {
+          services.push(service);
+        }
+        break;
+      }
+    }
+  }
+  
+  return services.slice(0, 6);
 }
 
 function extractRegion(url, analysis) {
