@@ -51,13 +51,6 @@
         .result-actions { margin-top: 20px; display: flex; gap: 10px; }
         .btn-secondary { flex: 1; padding: 12px; background: var(--light); color: var(--primary); border: 2px solid var(--primary); border-radius: 8px; font-size: 0.95rem; font-weight: 600; cursor: pointer; text-decoration: none; text-align: center; }
         .btn-secondary:hover { background: var(--primary); color: white; }
-        .score-preview { background: white; border-radius: 10px; padding: 15px; margin-top: 15px; }
-        .score-preview h4 { color: var(--primary); margin-bottom: 10px; }
-        .score-bars { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-        .score-bar { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; }
-        .score-bar-label { min-width: 90px; color: var(--gray); }
-        .score-bar-fill { flex: 1; height: 8px; background: #e0e0e0; border-radius: 4px; overflow: hidden; }
-        .score-bar-value { min-width: 30px; text-align: right; font-weight: 600; color: var(--primary); }
         .how-it-works { margin-top: 40px; color: rgba(255,255,255,0.8); }
         .how-it-works h2 { font-size: 1.3rem; margin-bottom: 15px; text-align: center; }
         .steps-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
@@ -70,6 +63,13 @@
         .result-actions { margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap; }
         .btn-email { background: var(--success); color: white; }
         .btn-email:hover { background: #228b75; }
+        .score-preview { background: white; border-radius: 10px; padding: 20px; margin-top: 15px; }
+        .score-preview h4 { color: var(--primary); margin-bottom: 15px; font-size: 1.2rem; }
+        .score-bars { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .score-bar { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; }
+        .score-bar-label { min-width: 100px; color: var(--gray); }
+        .score-bar-fill { flex: 1; height: 10px; background: #e0e0e0; border-radius: 5px; overflow: hidden; }
+        .score-bar-value { min-width: 35px; text-align: right; font-weight: 600; color: var(--primary); font-size: 0.9rem; }
     </style>
 </head>
 <body>
@@ -115,10 +115,12 @@
                 <div class="score-preview" id="scorePreview">
                     <h4>Score: <span id="finalScore">0</span>/100</h4>
                     <div class="score-bars" id="scoreBars"></div>
+                    <div style="margin-top: 20px;">
+                        <button class="btn btn-email" id="sendEmailBtn" style="width: 100%;">Enviar Relatorio por Email</button>
+                    </div>
                 </div>
                 <div class="result-actions">
                     <a href="#" class="btn-secondary" id="viewReport" target="_blank">Ver Relatorio</a>
-                    <button class="btn-secondary" id="sendEmailBtn">Enviar por Email</button>
                     <button class="btn-secondary" id="newAnalysis">Nova Analise</button>
                 </div>
             </div>
