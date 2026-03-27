@@ -1410,10 +1410,10 @@ function generateHTMLReport(result, analysis) {
             </table>
         </section>
 
-        ${analysis.socialMedia && analysis.socialMedia.summary && analysis.socialMedia.summary.activeProfiles > 0 ? `
+        ${(analysis.socialMedia && analysis.socialMedia.summary && analysis.socialMedia.summary.activeProfiles > 0) || (analysis.socialMedia && (analysis.socialMedia.linkedin || analysis.socialMedia.instagram || analysis.socialMedia.youtube || analysis.socialMedia.facebook || analysis.socialMedia.twitter)) ? `
         <section class="card">
             <h2>Redes Sociais Analisadas</h2>
-            <p style="margin-bottom: 15px; color: var(--gray);">Perfis ativos encontrados: <strong>${analysis.socialMedia.summary.activeProfiles}</strong></p>
+            <p style="margin-bottom: 15px; color: var(--gray);">Perfis ${analysis.socialMedia.summary?.activeProfiles > 0 ? 'ativos encontrados: <strong>' + analysis.socialMedia.summary.activeProfiles : 'encontrados no site'}</strong></p>
             <div class="social-grid">
                 ${analysis.socialMedia.linkedin ? `
                     <div class="social-item linkedin">
