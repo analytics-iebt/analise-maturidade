@@ -1342,11 +1342,6 @@ function generateHTMLReport(result, analysis) {
         .level-indicator.current { background: var(--accent); color: var(--dark); transform: scale(1.2); }
         .site-info { background: var(--light); padding: 15px; border-radius: 8px; margin: 10px 0; font-family: monospace; font-size: 0.9rem; word-break: break-all; }
         .llm-badge { display: inline-block; background: var(--success); color: white; padding: 4px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; margin-top: 5px; }
-        .pages-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; margin-top: 15px; }
-        .page-item { background: var(--light); padding: 15px; border-radius: 8px; border-left: 4px solid var(--secondary); }
-        .page-item h4 { color: var(--primary); font-size: 1rem; margin-bottom: 10px; font-family: monospace; }
-        .page-item p { margin: 5px 0; font-size: 0.85rem; color: var(--gray); }
-        .page-item strong { color: var(--dark); }
         .social-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 15px; }
         .social-item { background: var(--light); padding: 15px; border-radius: 8px; text-align: center; border-top: 4px solid var(--secondary); }
         .social-item.linkedin { border-top-color: #0077b5; }
@@ -1408,30 +1403,8 @@ function generateHTMLReport(result, analysis) {
                 <tr><th>URL</th><td>${analysis.url}</td></tr>
                 <tr><th>Título do Site</th><td>${analysis.title}</td></tr>
                 <tr><th>Segurança HTTPS</th><td>${analysis.hasHttps ? '✓ Ativo' : '✗ Inativo'}</td></tr>
-                <tr><th>Páginas Internas Analisadas</th><td>${analysis.internalPages ? Object.keys(analysis.internalPages).length : 0}</td></tr>
             </table>
         </section>
-        
-        ${analysis.internalPages && Object.keys(analysis.internalPages).length > 0 ? `
-        <section class="card">
-            <h2>Páginas Internas Analisadas</h2>
-            <div class="pages-grid">
-                ${Object.entries(analysis.internalPages).map(([path, data]) => `
-                    <div class="page-item">
-                        <h4>${path}</h4>
-                        <p><strong>Tipo:</strong> ${data.pageType}</p>
-                        <p><strong>Palavras:</strong> ${data.wordCount}</p>
-                        ${data.email ? `<p><strong>Email:</strong> ${data.email}</p>` : ''}
-                        ${data.phone ? `<p><strong>Telefone:</strong> ${data.phone}</p>` : ''}
-                        ${data.address ? `<p><strong>Endereço:</strong> ${data.address}</p>` : ''}
-                        ${data.hasForm ? `<p><strong>Formulários:</strong> ${data.formTypes.join(', ')}</p>` : ''}
-                        ${data.technologies && data.technologies.length > 0 ? `<p><strong>Ferramentas:</strong> ${data.technologies.join(', ')}</p>` : ''}
-                        ${data.innovationKeywords && data.innovationKeywords.length > 0 ? `<p><strong>Inovação:</strong> ${data.innovationKeywords.map(i => i.category).join(', ')}</p>` : ''}
-                    </div>
-                `).join('')}
-            </div>
-        </section>
-        ` : ''}
 
         ${analysis.socialMedia && analysis.socialMedia.summary && analysis.socialMedia.summary.activeProfiles > 0 ? `
         <section class="card">
