@@ -229,6 +229,14 @@ app.post('/api/send-email', async (req, res) => {
     }
     
     try {
+        if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+            console.error('EMAIL_USER or EMAIL_PASS not configured');
+            return res.status(500).json({ 
+                error: 'Configuração de email incompleta',
+                details: 'As variáveis EMAIL_USER e EMAIL_PASS precisam estar configuradas no servidor'
+            });
+        }
+        
         const nodemailer = require('nodemailer');
         const htmlPdf = require('html-pdf-node');
         
