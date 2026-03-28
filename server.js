@@ -253,6 +253,19 @@ app.post('/api/send-email', async (req, res) => {
         
         console.log('Etapa 2: Transportador criado');
         
+        console.log('Verificando conexão com Gmail...');
+        await new Promise((resolve, reject) => {
+            transporter.verify((error, success) => {
+                if (error) {
+                    console.error('Erro na verificação:', error.message);
+                    reject(error);
+                } else {
+                    console.log('Conexão com Gmail OK');
+                    resolve(success);
+                }
+            });
+        });
+        
         const mailOptions = {
             from: process.env.EMAIL_USER,
             to: email,
@@ -268,18 +281,24 @@ app.post('/api/send-email', async (req, res) => {
             `
         };
         
-        console.log('Etapa 3: Enviando email...');
+        console.log('Etapa 3: Enviando email para:', email);
+        console.log('Etapa 4: Chamando transporter.sendMail...');
         
-        await transporter.sendMail(mailOptions);
+        const info = await transporter.sendMail(mailOptions);
+        console.log('Etapa 5: Email enviado!');
+        console.log('Message ID:', info.messageId);
+        console.log('Response:', info.response);
         
         console.log('=== EMAIL ENVIADO COM SUCESSO ===');
-        res.json({ success: true, message: 'Email enviado com sucesso!' });
+        res.json({ success: true, message: 'Email enviado com sucesso!', messageId: info.messageId });
     } catch (error) {
         console.error('=== ERRO COMPLETO ===');
         console.error('Nome do erro:', error.name);
         console.error('Mensagem do erro:', error.message);
         console.error('Código do erro:', error.code);
-        console.error('Erro completo:', error);
+        console.error('Response code:', error.responseCode);
+        console.error('Response:', error.response);
+        console.error('Erro completo:', JSON.stringify(error, null, 2));
         res.status(500).json({ 
             error: 'Erro ao enviar email',
             details: error.message,
