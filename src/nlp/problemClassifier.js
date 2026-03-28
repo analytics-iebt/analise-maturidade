@@ -1,6 +1,8 @@
 class ProblemClassifier {
   constructor(problemsDb) {
     this.problemsDb = problemsDb;
+    
+    this.GENERIC_KEYWORDS = ['pagamento', 'pagamentos', 'cartão', 'pix', 'boleto', 'crédito', 'débito', 'transferência', 'banco', 'financeiro', 'contato', 'sobre', 'termos', 'privacidade', 'politica', 'copyright', 'todos os direitos', 'endereço'];
   }
 
   classify(siteData) {
@@ -9,7 +11,12 @@ class ProblemClassifier {
     const allText = this.buildTextCorpus(siteData);
     const allTextLower = allText.toLowerCase();
     
-    const problemScores = this.scoreProblems(allTextLower);
+    const headingsText = (siteData.headings || []).join(' ').toLowerCase();
+    const heroText = (siteData.hero || '').toLowerCase();
+    const featuresText = (siteData.features || []).join(' ').toLowerCase();
+    const titleText = (siteData.title || '').toLowerCase();
+    
+    const problemScores = this.scoreProblems(allTextLower, headingsText, heroText, featuresText, titleText);
     const sortedProblems = Object.entries(problemScores)
       .sort((a, b) => b[1].score - a[1].score);
 
@@ -71,33 +78,96 @@ class ProblemClassifier {
     return parts.filter(p => p).join(' ');
   }
 
-  scoreProblems(text) {
+  isGenericKeyword(keyword) {
+    return this.GENERIC_KEYWORDS.some(gk => keyword.toLowerCase().includes(gk));
+  }
+
+  countKeywordOccurrences(text, keyword) {
+    const regex = new RegExp(keyword.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+    const matches = text.match(regex);
+    return matches ? matches.length : 0;
+  }
+
+  scoreProblems(text, headingsText, heroText, featuresText, titleText) {
     const scores = {};
     
     for (const [problemKey, problemData] of Object.entries(this.problemsDb.problems)) {
       scores[problemKey] = {
         score: 0,
         matchedKeywords: [],
-        matchedSubcategories: []
+        matchedSubcategories: [],
+        headingScore: 0,
+        heroScore: 0,
+        featureScore: 0,
+        titleScore: 0
       };
 
       for (const keyword of problemData.keywords || []) {
+        if (this.isGenericKeyword(keyword)) continue;
+        
+        let baseScore = 0;
+        let inHeading = false;
+        let inHero = false;
+        let inFeature = false;
+        let inTitle = false;
+        
         if (text.includes(keyword.toLowerCase())) {
-          scores[problemKey].score += 10;
+          baseScore = 10;
+        }
+        
+        if (headingsText.includes(keyword.toLowerCase())) {
+          inHeading = true;
+          scores[problemKey].headingScore += 15;
+        }
+        
+        if (heroText.includes(keyword.toLowerCase())) {
+          inHero = true;
+          scores[problemKey].heroScore += 12;
+        }
+        
+        if (featuresText.includes(keyword.toLowerCase())) {
+          inFeature = true;
+          scores[problemKey].featureScore += 8;
+        }
+        
+        if (titleText.includes(keyword.toLowerCase())) {
+          inTitle = true;
+          scores[problemKey].titleScore += 10;
+        }
+        
+        if (baseScore > 0 || inHeading || inHero || inFeature || inTitle) {
           scores[problemKey].matchedKeywords.push(keyword);
         }
+        
+        scores[problemKey].score += baseScore;
       }
 
       for (const [subKey, subData] of Object.entries(problemData.subcategories || {})) {
         for (const subKeyword of subData.keywords || []) {
+          if (this.isGenericKeyword(subKeyword)) continue;
+          
+          let subScore = 0;
+          
           if (text.includes(subKeyword.toLowerCase())) {
-            scores[problemKey].score += 15;
+            subScore = 15;
+          }
+          
+          if (headingsText.includes(subKeyword.toLowerCase())) {
+            subScore += 20;
+          }
+          
+          if (heroText.includes(subKeyword.toLowerCase())) {
+            subScore += 15;
+          }
+          
+          if (subScore > 0) {
             if (!scores[problemKey].matchedKeywords.includes(subKeyword)) {
               scores[problemKey].matchedKeywords.push(subKeyword);
             }
             if (!scores[problemKey].matchedSubcategories.includes(subKey)) {
               scores[problemKey].matchedSubcategories.push(subKey);
             }
+            scores[problemKey].score += subScore;
           }
         }
       }
@@ -117,6 +187,7 @@ class ProblemClassifier {
       const matched = [];
       
       for (const keyword of subData.keywords || []) {
+        if (this.isGenericKeyword(keyword)) continue;
         if (text.includes(keyword.toLowerCase())) {
           score += 5;
           matched.push(keyword);
@@ -141,15 +212,22 @@ class ProblemClassifier {
   calculateConfidence(scoreData) {
     let confidence = 0;
     
-    if (scoreData.score >= 50) confidence += 40;
-    else if (scoreData.score >= 30) confidence += 25;
-    else if (scoreData.score >= 10) confidence += 15;
+    if (scoreData.score >= 80) confidence += 40;
+    else if (scoreData.score >= 50) confidence += 30;
+    else if (scoreData.score >= 30) confidence += 20;
+    else if (scoreData.score >= 15) confidence += 10;
     
-    if (scoreData.matchedKeywords.length >= 5) confidence += 30;
-    else if (scoreData.matchedKeywords.length >= 3) confidence += 20;
-    else if (scoreData.matchedKeywords.length >= 1) confidence += 10;
+    if (scoreData.headingScore >= 20) confidence += 25;
+    else if (scoreData.headingScore >= 10) confidence += 15;
     
-    if (scoreData.matchedSubcategories?.length > 0) confidence += 20;
+    if (scoreData.heroScore >= 15) confidence += 15;
+    else if (scoreData.heroScore >= 5) confidence += 10;
+    
+    if (scoreData.matchedKeywords.length >= 5) confidence += 15;
+    else if (scoreData.matchedKeywords.length >= 3) confidence += 10;
+    else if (scoreData.matchedKeywords.length >= 1) confidence += 5;
+    
+    if (scoreData.matchedSubcategories?.length > 0) confidence += 15;
     
     return Math.min(100, confidence);
   }
