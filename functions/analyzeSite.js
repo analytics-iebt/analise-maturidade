@@ -1,5 +1,6 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
+const CompetitorAnalysisAgent = require('../src/index');
 
 const BASE_TIMEOUT = 15000;
 const MAX_PAGES = 8;
@@ -248,13 +249,29 @@ function classifySector(analysis, socialMedia) {
   return bestMatch.sector;
 }
 
-async function generateBenchmark(analysis, scores, sector, companyName) {
-  const benchmark = SECTOR_BENCHMARKS[sector] || SECTOR_BENCHMARKS['Default'];
+async function generateBenchmark(analysis, scores, businessType, companyName) {
+  const benchmark = SECTOR_BENCHMARKS[businessType] || SECTOR_BENCHMARKS['Default'];
   
   const companySize = analysis.socialMedia?.linkedin?.companySize || 
                       (analysis.socialMedia?.linkedin?.employees ? estimateCompanySize(analysis.socialMedia.linkedin.employees) : 'medium');
   
-  const { competitors, productsAndServices, googleSearched } = await findRelevantCompetitors(companyName, sector, companySize, analysis.socialMedia, analysis);
+  let competitorResult = {
+    competitors: [],
+    productsAndServices: {},
+    googleSearched: false
+  };
+  
+  try {
+    console.log('[Benchmark] Usando novo sistema de análise de concorrência...');
+    const competitorAgent = new CompetitorAnalysisAgent();
+    competitorResult = await competitorAgent.analyzeCompetitors(analysis.url, scores);
+    
+    console.log(`[Benchmark] Concorrentes encontrados: ${competitorResult.report?.competitorAnalysis?.total_encontrados || 0}`);
+    console.log(`[Benchmark] Top concorrente: ${competitorResult.report?.competitorAnalysis?.top_competitor || 'N/A'}`);
+  } catch (error) {
+    console.error('[Benchmark] Erro no agente de concorrência, usando método antigo:', error.message);
+    competitorResult = await findRelevantCompetitors(companyName, businessType, companySize, analysis.socialMedia, analysis);
+  }
   
   const gaps = {};
   const comparisons = {};
@@ -284,8 +301,10 @@ async function generateBenchmark(analysis, scores, sector, companyName) {
     'enterprise': 'Grande Porte (1000+ funcionários)'
   };
   
+  const competitorNames = competitorResult.report?.competitorAnalysis?.competitors?.slice(0, 8).map(c => c.nome) || competitorResult.competitors || [];
+  
   return {
-    sector,
+    sector: businessType,
     sectorDescription: benchmark.description,
     avgScores: benchmark.avgScores,
     avgFinalScore: benchmark.avgFinalScore,
@@ -293,12 +312,14 @@ async function generateBenchmark(analysis, scores, sector, companyName) {
     overallGap,
     percentile,
     dimensionComparisons: comparisons,
-    leaders: competitors,
-    productsAndServices: productsAndServices,
-    recommendations: generateGapRecommendations(gaps, sector),
+    leaders: competitorNames,
+    productsAndServices: competitorResult.report?.serviceProfile || competitorResult.productsAndServices || {},
+    recommendations: generateGapRecommendations(gaps, businessType),
     companySize,
     companySizeLabel: porteLabel[companySize] || porteLabel['medium'],
-    competitorsSource: googleSearched ? 'Google + Base Local' : 'Base Local'
+    competitorsSource: 'Problem-Solution Agent',
+    competitorDetails: competitorResult.report?.competitorAnalysis || null,
+    serviceProfile: competitorResult.report?.serviceProfile || null
   };
 }
 
@@ -2470,6 +2491,17 @@ function generateHTMLReport(result, analysis) {
                     </tr>
                 </tbody>
             </table>
+            ${result.benchmark.serviceProfile && result.benchmark.serviceProfile.problema_principal ? `
+            <div style="margin-top: 20px; padding: 15px; background: var(--light); border-radius: 8px;">
+                <h4 style="color: var(--primary); margin-bottom: 10px;">Perfil do Negócio Identificado</h4>
+                <div style="font-size: 0.9rem;">
+                    <p><strong>Problema Principal:</strong> ${result.benchmark.serviceProfile.problema_principal.name || result.benchmark.serviceProfile.problema_principal.categoria}</p>
+                    ${result.benchmark.serviceProfile.publico_alvo && result.benchmark.serviceProfile.publico_alvo.length > 0 ? `<p><strong>Público-alvo:</strong> ${result.benchmark.serviceProfile.publico_alvo.join(', ')}</p>` : ''}
+                    ${result.benchmark.serviceProfile.tecnologias && result.benchmark.serviceProfile.tecnologias.length > 0 ? `<p><strong>Tecnologias:</strong> ${result.benchmark.serviceProfile.tecnologias.slice(0, 5).join(', ')}</p>` : ''}
+                    <p style="color: var(--gray); font-size: 0.8rem;">Confiança do perfil: ${result.benchmark.serviceProfile.score_confianca || 0}%</p>
+                </div>
+            </div>
+            ` : ''}
             ${result.benchmark.productsAndServices && result.benchmark.productsAndServices.negocios && result.benchmark.productsAndServices.negocios.length > 0 ? `
             <div style="margin-top: 20px; padding: 15px; background: var(--light); border-radius: 8px;">
                 <h4 style="color: var(--primary); margin-bottom: 10px;">Negócios e Concorrentes Identificados</h4>
@@ -2492,10 +2524,11 @@ function generateHTMLReport(result, analysis) {
             ` : ''}
             ${result.benchmark.leaders && result.benchmark.leaders.length > 0 ? `
             <div style="margin-top: 20px;">
-                <p style="color: var(--gray); font-size: 0.9rem; margin-bottom: 10px;">Outros concorrentes para referência:</p>
+                <p style="color: var(--gray); font-size: 0.9rem; margin-bottom: 10px;">Concorrentes identificados:</p>
                 <div class="leader-list">
-                    ${result.benchmark.leaders.map(l => `<span class="leader-tag" title="Analise a presença digital deste concorrente">${l}</span>`).join('')}
+                    ${result.benchmark.leaders.map(l => `<span class="leader-tag" title="Concorrente identificado pelo sistema Problem-Solution">${l}</span>`).join('')}
                 </div>
+                <p style="color: var(--gray); font-size: 0.75rem; margin-top: 8px;">Fonte: Análise baseada nos serviços reais da empresa</p>
             </div>
             ` : ''}
             ${result.benchmark.recommendations && result.benchmark.recommendations.length > 0 ? `
