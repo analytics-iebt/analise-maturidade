@@ -1,0 +1,329 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2026-03-27",
+  "problems": {
+    "atendimento": {
+      "name": "Atendimento e Suporte ao Cliente",
+      "description": "Soluções para comunicação e suporte ao cliente",
+      "keywords": ["atendimento", "suporte", "cliente", "chat", "ticket", "helpdesk", "sac", "atender", "atendimento ao cliente", "central de atendimento", "contato", "ajuda"],
+      "subcategories": {
+        "chatbot": {
+          "name": "Chatbot e Automação de Chat",
+          "keywords": ["chatbot", "bot de conversa", "automação de chat", "conversa automatica", "chat ia", "atendente virtual", "robô de atendimento"],
+          "competitors": ["Intercom", "Drift", "ManyChat", "Chatfuel", "Freshchat", "Zendesk Chat"]
+        },
+        "helpdesk": {
+          "name": "Helpdesk e Gestão de Tickets",
+          "keywords": ["helpdesk", "ticket", "gestão de chamados", "chamados", "incidentes", "suporte técnico", "service desk", "ITSM"],
+          "competitors": ["Zendesk", "Freshdesk", "HelpScout", "Jira Service Management", "Freshservice", "Kayako"]
+        },
+        "call_center": {
+          "name": "Call Center e Telefonia",
+          "keywords": ["call center", "telefonia", "voip", "URA", "discador", "gravação de chamadas", "contact center", "atendimento telefônico", "ramal", "PABX"],
+          "competitors": ["Twilio", "Talkdesk", "Genesys", "Five9", "Nice inContact", "Vonage"]
+        },
+        "messenger": {
+          "name": "Mensageria e Redes Sociais",
+          "keywords": ["whatsapp", "facebook messenger", "telegram", "redes sociais", "atendimento redes sociais", "multi-canal", "omnichannel", " inbox"],
+          "competitors": ["Intercom", "Crisp", "Olark", "LiveChat", "Zendesk", "HubSpot Service Hub"]
+        }
+      },
+      "competitors": ["Intercom", "Zendesk", "Freshdesk", "HelpScout", "LiveChat", "Crisp", "Drift", "HubSpot Service Hub"]
+    },
+    "vendas": {
+      "name": "Vendas e CRM",
+      "description": "Soluções para gestão de vendas e relacionamento com clientes",
+      "keywords": ["vendas", "crm", "pipeline", "lead", "oportunidade", "conversão", "prospect", "cliente", "negociação", "venda"],
+      "subcategories": {
+        "crm": {
+          "name": "CRM e Gestão de Clientes",
+          "keywords": ["crm", "gestão de clientes", "relacionamento", "controle de clientes", "cadastro de clientes", "base de clientes"],
+          "competitors": ["Salesforce", "HubSpot CRM", "Pipedrive", "Zoho CRM", "Microsoft Dynamics", "SugarCRM"]
+        },
+        "prospecting": {
+          "name": "Prospecção e Outbound",
+          "keywords": ["prospecting", "lead qualification", "outbound", "cold email", "sequência de vendas", "SDR", "list building", "enriquecimento de dados"],
+          "competitors": ["Outreach", "Salesloft", "Apollo", "Hunter", "ZoomInfo", "LinkedIn Sales Navigator"]
+        },
+        "cpq": {
+          "name": "CPQ e Precificação",
+          "keywords": ["cpq", "configure price quote", "precificação", "proposta comercial", "cotação", "orçamento de vendas", "product configurator"],
+          "competitors": ["Salesforce CPQ", "Oracle CPQ", "SAP CPQ", "Conga", "ConfigureID", "Qwilro"]
+        }
+      },
+      "competitors": ["Salesforce", "HubSpot CRM", "Pipedrive", "Zoho CRM", "Microsoft Dynamics", "SAP CRM", "Oracle CRM"]
+    },
+    "marketing": {
+      "name": "Marketing Digital",
+      "description": "Soluções para marketing, tráfego e aquisição de clientes",
+      "keywords": ["marketing", "tráfego", "seo", "ads", "social media", "conteúdo", "campanha", "landing page", "leads", "growth", "aquisição"],
+      "subcategories": {
+        "automation": {
+          "name": "Marketing Automation",
+          "keywords": ["marketing automation", "email marketing", "nurturing", "automação de marketing", "fluxo de emails", "lead nurturing", "email sequences"],
+          "competitors": ["Mailchimp", "HubSpot Marketing", "ActiveCampaign", "Drip", "ConvertKit", "Klaviyo"]
+        },
+        "analytics": {
+          "name": "Analytics e BI",
+          "keywords": ["analytics", "bi", "dashboard", "reporting", "visualização de dados", "métricas", "google analytics", "atrribution"],
+          "competitors": ["Google Analytics", "Mixpanel", "Amplitude", "Heap", "Pendo", "Hotjar"]
+        },
+        "seo": {
+          "name": "SEO e Search Marketing",
+          "keywords": ["seo", "search engine optimization", "tráfego orgânico", "google search", "pesquisa paga", "sem", "search marketing", "link building"],
+          "competitors": ["SEMrush", "Ahrefs", "Moz", "Screaming Frog", "Majestic", "Google Search Console"]
+        },
+        "social": {
+          "name": "Gestão de Redes Sociais",
+          "keywords": ["gestão de redes sociais", "social media management", "publicação automática", "agendamento de posts", "redes sociais", "social publishing"],
+          "competitors": ["Hootsuite", "Buffer", "Sprout Social", "Later", "Planoly", "Metricool"]
+        }
+      },
+      "competitors": ["HubSpot Marketing", "Mailchimp", "ActiveCampaign", "RD Station", "Mautic", "Keitaro"]
+    },
+    "financeiro": {
+      "name": "Gestão Financeira e Pagamentos",
+      "description": "Soluções para finanças, pagamentos e gestão de caixa",
+      "keywords": ["pagamento", "fatura", "cobrança", "contas", "tesouraria", "invoice", "faturamento", "recebimento", "pix", "boleto", "cartão"],
+      "subcategories": {
+        "pagamentos": {
+          "name": "Gateways e Pagamentos",
+          "keywords": ["gateway de pagamento", "pagamento online", "cartão de crédito", "pix", "boleto", "payment processing", "checkout", "carrinho de compras"],
+          "competitors": ["Stripe", "Pagar.me", "MercadoPago", "Adyen", "PagSeguro", "Worldpay"]
+        },
+        "gestao": {
+          "name": "Gestão Financeira",
+          "keywords": ["gestão financeira", "controle de gastos", "budget", "planejamento financeiro", "fluxo de caixa", "contas a pagar", "contas a receber", "conciliation"],
+          "competitors": [" ContaAzul", "Tiny ERP", "Nuvemshop Finance", "Finkok", " Conta azul"]
+        },
+        "cobranca": {
+          "name": "Cobrança e Recuperação",
+          "keywords": ["cobrança", "recuperação de crédito", "boleto vencido", "inadimplência", "negociação de dividas", "fidelity", "chargeback"],
+          "competitors": [" Asaas", "Gerencianet", "Pagar.me", "Ebanx", "Zoop", "Stone"]
+        }
+      },
+      "competitors": ["Stripe", "Pagar.me", "MercadoPago", "PagSeguro", " Asaas", "Gerencianet"]
+    },
+    "operacoes": {
+      "name": "Operações e Automação",
+      "description": "Soluções para automação de processos e gestão operacional",
+      "keywords": ["operações", "processos", "automação", "workflow", "rpa", "tarefas", "produtividade", "eficiência", "流程自动化"],
+      "subcategories": {
+        "automation": {
+          "name": "Automação de Workflow",
+          "keywords": ["automação", "rpa", "workflow", "processos", "robotic process automation", "automação de tarefas", "no-code", "low-code"],
+          "competitors": ["Zapier", "Make", "Power Automate", "n8n", "Automate.io", "Workato"]
+        },
+        "project": {
+          "name": "Gestão de Projetos",
+          "keywords": ["projeto", "tarefa", "kanban", "agile", "scrum", "gestão de projetos", "timeline", "milestone", "OKR"],
+          "competitors": ["Monday.com", "Asana", "Trello", "Jira", "ClickUp", "Notion"]
+        },
+        "erp": {
+          "name": "ERP e Gestão Empresarial",
+          "keywords": ["erp", "enterprise resource planning", "gestão empresarial", "sap", "totvs", "logística", "estoque", "estoque", "warehouse"],
+          "competitors": ["SAP", "Oracle ERP", "TOTVS", "Senior", " Sankhya", "eGest"]
+        }
+      },
+      "competitors": ["Zapier", "Make", "Monday.com", "Notion", "Asana", "Trello", "Power Automate"]
+    },
+    "ia_dados": {
+      "name": "Inteligência Artificial e Dados",
+      "description": "Soluções baseadas em IA, machine learning e análise de dados",
+      "keywords": ["ia", "inteligência artificial", "machine learning", "analytics", "bi", "dados", "insights", "deep learning", "nlp", "data science"],
+      "subcategories": {
+        "nlp": {
+          "name": "NLP e Processamento de Linguagem",
+          "keywords": ["nlp", "processamento de linguagem", "chatbot ia", "texto", "análise de texto", "sentiment analysis", "text analysis", "speech to text", "ocr"],
+          "competitors": ["OpenAI", "Anthropic", "Google NLP", "Azure Cognitive Services", "IBM Watson", "Cohere"]
+        },
+        "analytics": {
+          "name": "Analytics e Business Intelligence",
+          "keywords": ["analytics", "bi", "dashboard", "data visualization", "business intelligence", "reporting", "data warehouse", "etl"],
+          "competitors": ["Tableau", "Power BI", "Looker", "Qlik", "Metabase", "Grafana"]
+        },
+        "automation_ia": {
+          "name": "Automação com IA",
+          "keywords": ["automação ia", "ia generativa", "gpt", "llm", "copilot", "assistant", "agent", "autonomous"],
+          "competitors": ["OpenAI", "Anthropic", "Google Gemini", "Microsoft Copilot", "AWS AI", "Cohere"]
+        },
+        "computer_vision": {
+          "name": "Visão Computacional",
+          "keywords": ["visão computacional", "computer vision", "reconhecimento de imagem", "detecção de objetos", "face recognition", "ocr", "document processing"],
+          "competitors": ["Google Cloud Vision", "AWS Rekognition", "Azure Computer Vision", "Clarifai", "OpenCV"]
+        }
+      },
+      "competitors": ["OpenAI", "Anthropic", "Google AI", "Microsoft AI", "IBM Watson", "DataRobot", "H2O.ai"]
+    },
+    "educacao": {
+      "name": "Educação e Treinamento",
+      "description": "Soluções para educação, cursos e treinamento corporativo",
+      "keywords": ["educação", "curso", "treinamento", "ead", "aprendizado", "learning", "certificação", "capacitação", "escola", "aluno"],
+      "subcategories": {
+        "lms": {
+          "name": "LMS e Plataformas de Curso",
+          "keywords": ["lms", "plataforma de cursos", "ead", "courses", "learning management", "cursos online", "treinamento", "certificação"],
+          "competitors": ["Hotmart", "Eduzz", "Monetizze", "Teachable", "Thinkific", "Kajabi"]
+        },
+        "corporate": {
+          "name": "Treinamento Corporativo",
+          "keywords": ["treinamento corporativo", "onboarding", "capacitação", "desenvolvimento", "talent", "learning and development", "L&D"],
+          "competitors": ["Docebo", "SAP SuccessFactors", "Cornerstone", "360Learning", "TalentLMS", "SC Training"]
+        }
+      },
+      "competitors": ["Hotmart", "Eduzz", "Monetizze", "Teachable", "Kajabi", "LearnWorlds"]
+    },
+    "rh": {
+      "name": "Recursos Humanos",
+      "description": "Soluções para gestão de pessoas e RH",
+      "keywords": ["rh", "recursos humanos", "funcionários", "folha de pagamento", "ponto", "admissão", "demissão", "benefícios", "gestão de pessoas"],
+      "subcategories": {
+        "payroll": {
+          "name": "Folha de Pagamento",
+          "keywords": ["folha de pagamento", "pagamento", "salário", "holerite", "INSS", "FGTS", "imposto de renda", "eSocial"],
+          "competitors": ["Senior", "TOTVS", "Sankhya", "OmniGPT", "Contabilizei"]
+        },
+        "recruitment": {
+          "name": "Recrutamento e Seleção",
+          "keywords": ["recrutamento", "seleção", "vaga", "candidato", "entrevista", "hiring", "ATS", "applicant tracking"],
+          "competitors": ["Gupy", "Vagas.com.br", "Catho", "Recruta.BIZ", "Workable", "Greenhouse"]
+        },
+        "performance": {
+          "name": "Gestão de Performance",
+          "keywords": ["performance", "avaliação de desempenho", "OKR", "feedback", "promoção", "desenvolvimento", "carreira", "succession"],
+          "competitors": ["Lattice", "15Five", "Betterworks", "Culture Amp", " Reflektive"]
+        }
+      },
+      "competitors": ["Gupy", "Senior", "TOTVS", "Vagas.com.br", "Catho", "Contabilizei"]
+    },
+    "ecommerce": {
+      "name": "E-commerce e Varejo Digital",
+      "description": "Soluções para lojas virtuais e comércio eletrônico",
+      "keywords": ["e-commerce", "loja virtual", "compras", "carrinho", "checkout", "pagamento", "frete", "estoque", "venda online", "marketplace"],
+      "subcategories": {
+        "platform": {
+          "name": "Plataformas de E-commerce",
+          "keywords": ["plataforma ecommerce", "criação de loja", "loja online", "ecommerce platform", "online store"],
+          "competitors": ["Shopify", "Nuvemshop", "VTEX", "Tray", "Magento", "WooCommerce"]
+        },
+        "marketplace": {
+          "name": "Marketplaces",
+          "keywords": ["marketplace", "multi-vendedor", "marketplace platform", "seller", "vendedor"],
+          "competitors": ["Mercado Livre", "Amazon Brasil", "Shopee", "Magazine Luiza", "B2W"]
+        },
+        "fulfillment": {
+          "name": "Fulfillment e Logística",
+          "keywords": ["fulfillment", "logística", "estoque", "armazenagem", "envio", "delivery", "última milha"],
+          "competitors": ["Nuvemshop", "VTEX", "Rappi", "iFood", "Loggi", "Lalamove"]
+        }
+      },
+      "competitors": ["Shopify", "Nuvemshop", "VTEX", "Tray", "Magento", "WooCommerce"]
+    },
+    "construcao": {
+      "name": "Construção e Imobiliário",
+      "description": "Soluções para construção civil e mercado imobiliário",
+      "keywords": ["construção", "imobiliária", "imóvel", "apartamento", "obra", "projeto", "arquitetura", "engenharia", "incorp"],
+      "subcategories": {
+        "imob": {
+          "name": "Gestão Imobiliária",
+          "keywords": ["gestão imobiliária", "imobiliária", "corretora", "aluguel", "venda de imóveis", "administração de imóveis"],
+          "competitors": ["TOTVS Real Estate", "Sienge", "Consisan", "S狐狸", "Vectras"]
+        },
+        "crm_imob": {
+          "name": "CRM para Imobiliárias",
+          "keywords": ["crm imobiliário", "gestão de leads", "corretores", "imobiliária crm", "condomínio"],
+          "competitors": ["OmniChat", "Leadspark", "Imobzi", "Frogseller", "CRM Consulting"]
+        }
+      },
+      "competitors": ["TOTVS Real Estate", "Sienge", "Consisan", "Locaweb", "Vindi"]
+    },
+    "saude": {
+      "name": "Saúde e Bem-estar",
+      "description": "Soluções para healthcare, clínicas e bem-estar",
+      "keywords": ["saúde", "clínica", "médico", "hospital", "paciente", "atendimento médico", "prontuário", "exame", "laboratório"],
+      "subcategories": {
+        "clinica": {
+          "name": "Gestão de Clínicas",
+          "keywords": ["gestão de clínica", "sistema para clínica", "agenda médica", "prontuário eletrônico", "consulta", "marcação de consulta"],
+          "competitors": ["MV", "Tasy", "Schneider", "NEO", "GestãoClin", "iDrug"]
+        },
+        "telemedicina": {
+          "name": "Telemedicina",
+          "keywords": ["telemedicina", "consulta online", "teleconsulta", "atendimento remoto", "videochamada médica"],
+          "competitors": ["Dr.Consulta", "Doctoralia", "DoctorClinic", "Teladoc", "iDr"]
+        }
+      },
+      "competitors": ["MV", "Tasy", "Doctoralia", "iDr", "Teladoc", "Amazon Health"]
+    },
+    "juridico": {
+      "name": "Jurídico e Advocacia",
+      "description": "Soluções para escritórios de advocacia e departamento jurídico",
+      "keywords": ["advocacia", "jurídico", "escritório", "advogado", "processo", "tribunal", "petição", "contrato", "direito"],
+      "subcategories": {
+        "advocacia": {
+          "name": "Gestão para Advocacia",
+          "keywords": ["gestão advocacia", "escritório de advocacia", "advocacia", "processos", "honorários", "agenda de audiências"],
+          "competitors": ["Advology", "Legis", "Pje", "Juris", "Advbox", "Lextech"]
+        },
+        "contratos": {
+          "name": "Gestão de Contratos",
+          "keywords": ["gestão de contratos", "contratos", "assinatura digital", "cláusulas", "renovação", "compliance"],
+          "competitors": ["Juridoc", "Claus", "ContractPodAi", "DocuSign", "Signaturit"]
+        }
+      },
+      "competitors": ["Advology", "Legis", "Pje", "Juridoc", "DocuSign", "SignNow"]
+    }
+  },
+  "audiences": {
+    "b2c": {
+      "name": "Consumidor Final",
+      "keywords": ["consumidor", "pessoa física", "b2c", "cliente final", "varejo", "loja", "atacado"]
+    },
+    "b2b": {
+      "name": "Empresa (B2B)",
+      "keywords": ["empresa", "b2b", "negócios", "corporativo", "b2b saas", "smb", "pmi", "enterprise"]
+    },
+    "pme": {
+      "name": "PME e Pequenos Negócios",
+      "keywords": ["pme", "pequena empresa", "microempresa", "mei", "startup", "autônomo", "freelancer", "solo"]
+    },
+    "enterprise": {
+      "name": "Grande Empresa",
+      "keywords": ["grande empresa", "enterprise", "multinacional", "corporação", "holding", "grande porte", "500+ funcionários"]
+    },
+    "educacao_setor": {
+      "name": "Setor Educacional",
+      "keywords": ["escola", "universidade", "faculdade", "colégio", "instituto", "educação", "ead", "treinamento corporativo"]
+    },
+    "saude_setor": {
+      "name": "Setor de Saúde",
+      "keywords": ["hospital", "clínica", "laboratório", "farmácia", "médico", "enfermagem", "saúde", "SUS"]
+    },
+    "governo": {
+      "name": "Governo",
+      "keywords": ["governo", "público", "órgão público", "prefeitura", "estado", "federal", "municipal"]
+    }
+  },
+  "priceRanges": {
+    "free": {
+      "name": "Gratuito",
+      "keywords": ["gratuito", "free", "sem custo", "free tier", "trial", "grátis"]
+    },
+    "$": {
+      "name": "Econômico ($)",
+      "keywords": ["barato", "econômico", "até r$ 100", "low cost", "budget"]
+    },
+    "$$": {
+      "name": "Intermediário ($$)",
+      "keywords": ["intermediário", "médio", "r$ 100 a r$ 500", "profissional", "business"]
+    },
+    "$$$": {
+      "name": "Premium ($$$)",
+      "keywords": ["premium", "alto valor", "r$ 500 a r$ 2000", "avançado", "business pro"]
+    },
+    "enterprise": {
+      "name": "Enterprise",
+      "keywords": ["enterprise", "sob consulta", "personalizado", "ilimitado", "white glove", "dedicated"]
+    }
+  }
+}
