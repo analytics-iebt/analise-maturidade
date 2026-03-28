@@ -27,27 +27,27 @@
     },
     "atendimento": {
       "name": "Atendimento e Suporte ao Cliente",
-      "description": "Soluções para comunicação e suporte ao cliente",
-      "keywords": ["atendimento", "suporte", "cliente", "chat", "ticket", "helpdesk", "sac", "atender", "atendimento ao cliente", "central de atendimento", "contato", "ajuda"],
+      "description": "Soluções para comunicação e suporte ao cliente (chatbot, helpdesk, SAC, contact center)",
+      "keywords": ["chatbot", "helpdesk", "ticket", "sac", "atendente virtual", "central de atendimento", "service desk", "suporte ao cliente", "automação de atendimento", "chat de suporte", "tickets de suporte", "gestão de chamados", "incidentes", "ITSM", "URA", "PABX", "contact center", "call center", "voip"],
       "subcategories": {
         "chatbot": {
           "name": "Chatbot e Automação de Chat",
-          "keywords": ["chatbot", "bot de conversa", "automação de chat", "conversa automatica", "chat ia", "atendente virtual", "robô de atendimento"],
+          "keywords": ["chatbot", "bot de conversa", "automação de chat", "conversa automatica", "chat ia", "atendente virtual", "robô de atendimento", "whatsapp bot"],
           "competitors": ["Intercom", "Drift", "ManyChat", "Chatfuel", "Freshchat", "Zendesk Chat"]
         },
         "helpdesk": {
           "name": "Helpdesk e Gestão de Tickets",
-          "keywords": ["helpdesk", "ticket", "gestão de chamados", "chamados", "incidentes", "suporte técnico", "service desk", "ITSM"],
+          "keywords": ["helpdesk", "ticket", "gestão de chamados", "chamados", "incidentes", "suporte técnico", "service desk", "ITSM", "gestão de incidentes"],
           "competitors": ["Zendesk", "Freshdesk", "HelpScout", "Jira Service Management", "Freshservice", "Kayako"]
         },
         "call_center": {
           "name": "Call Center e Telefonia",
-          "keywords": ["call center", "telefonia", "voip", "URA", "discador", "gravação de chamadas", "contact center", "atendimento telefônico", "ramal", "PABX"],
+          "keywords": ["call center", "telefonia", "voip", "URA", "discador", "gravação de chamadas", "contact center", "atendimento telefônico", "ramal", "PABX", "central telefonica"],
           "competitors": ["Twilio", "Talkdesk", "Genesys", "Five9", "Nice inContact", "Vonage"]
         },
         "messenger": {
           "name": "Mensageria e Redes Sociais",
-          "keywords": ["whatsapp", "facebook messenger", "telegram", "redes sociais", "atendimento redes sociais", "multi-canal", "omnichannel", " inbox"],
+          "keywords": ["whatsapp", "facebook messenger", "telegram", "redes sociais", "atendimento redes sociais", "multi-canal", "omnichannel", "inbox unificado"],
           "competitors": ["Intercom", "Crisp", "Olark", "LiveChat", "Zendesk", "HubSpot Service Hub"]
         }
       },
@@ -55,8 +55,8 @@
     },
     "vendas": {
       "name": "Vendas e CRM",
-      "description": "Soluções para gestão de vendas e relacionamento com clientes",
-      "keywords": ["vendas", "crm", "pipeline", "lead", "oportunidade", "conversão", "prospect", "cliente", "negociação", "venda"],
+      "description": "Soluções para gestão de vendas, prospecção e relacionamento com clientes",
+      "keywords": ["vendas", "crm", "pipeline", "lead", "oportunidade", "conversão", "prospect", "cliente", "negociação", "venda", "prospecção", "prospeccao", "potenciais clientes", "segmentação", "segmentar", "mapeamento de mercado", "equipe comercial", "representante", "consultor", "coach", "enriquecimento de dados", "base de dados empresas", "lista de clientes", "exportar planilha", "performance de vendas", "comercial"],
       "subcategories": {
         "crm": {
           "name": "CRM e Gestão de Clientes",
@@ -64,9 +64,9 @@
           "competitors": ["Salesforce", "HubSpot CRM", "Pipedrive", "Zoho CRM", "Microsoft Dynamics", "SugarCRM"]
         },
         "prospecting": {
-          "name": "Prospecção e Outbound",
-          "keywords": ["prospecting", "lead qualification", "outbound", "cold email", "sequência de vendas", "SDR", "list building", "enriquecimento de dados"],
-          "competitors": ["Outreach", "Salesloft", "Apollo", "Hunter", "ZoomInfo", "LinkedIn Sales Navigator"]
+          "name": "Prospecção e Geração de Leads",
+          "keywords": ["prospecção", "prospeccao", "lead generation", "geração de leads", "potenciais clientes", "prospecting", "lead qualification", "outbound", "cold email", "sequência de vendas", "SDR", "list building", "enriquecimento de dados", "base de dados", "database empresas", "segmentar mercado", "radar de vendas", "mapeamento comercial", "painel de vendas", "pipeline vendas"],
+          "competitors": ["Outreach", "Salesloft", "Apollo", "Hunter", "ZoomInfo", "LinkedIn Sales Navigator", "Radar de Vendas", "Leadsters", "K不提", "Agendor"]
         },
         "cpq": {
           "name": "CPQ e Precificação",
@@ -74,7 +74,7 @@
           "competitors": ["Salesforce CPQ", "Oracle CPQ", "SAP CPQ", "Conga", "ConfigureID", "Qwilro"]
         }
       },
-      "competitors": ["Salesforce", "HubSpot CRM", "Pipedrive", "Zoho CRM", "Microsoft Dynamics", "SAP CRM", "Oracle CRM"]
+      "competitors": ["Salesforce", "HubSpot CRM", "Pipedrive", "Zoho CRM", "Microsoft Dynamics", "SAP CRM", "Oracle CRM", "Agendor", "K不提", "Leadsters", "RD Station CRM"]
     },
     "marketing": {
       "name": "Marketing Digital",
