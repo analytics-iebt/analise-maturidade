@@ -248,6 +248,9 @@ app.post('/api/send-email', async (req, res) => {
         
         console.log('Etapa 3: Enviando email para:', email);
         
+        const safeName = (companyName || 'analise').replace(/[^a-zA-Z0-9]/g, '-').substring(0, 50);
+        const reportBuffer = Buffer.from(reportHtml, 'utf-8');
+        
         const { data, error } = await resend.emails.send({
             from: 'IEBT Inovação <onboarding@resend.dev>',
             to: [email],
@@ -267,12 +270,18 @@ app.post('/api/send-email', async (req, res) => {
                             <li>Recomendações de melhoria</li>
                             <li>Análise comparativa com o setor</li>
                         </ul>
-                        <p>O relatório HTML completo foi gerado e está disponível para visualização.</p>
+                        <p><strong>Relatório em anexo!</strong> Abra o arquivo HTML em qualquer navegador.</p>
                         <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 20px 0;">
                         <p style="color: #6c757d; font-size: 0.9rem;">Atenciosamente,<br><strong>Equipe IEBT Inovação</strong></p>
                     </div>
                 </div>
-            `
+            `,
+            attachments: [
+                {
+                    filename: `relatorio-maturidade-${safeName}.html`,
+                    content: reportBuffer.toString('base64')
+                }
+            ]
         });
         
         console.log('Etapa 4: Resposta do Resend:', data, error);
