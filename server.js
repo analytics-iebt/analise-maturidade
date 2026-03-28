@@ -229,6 +229,9 @@ app.post('/api/send-email', async (req, res) => {
     }
     
     try {
+        console.log('=== INICIANDO ENVIO DE EMAIL ===');
+        console.log('Email config:', process.env.EMAIL_USER ? 'USER OK' : 'USER MISSING', process.env.EMAIL_PASS ? 'PASS OK' : 'PASS MISSING');
+        
         if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
             console.error('EMAIL_USER or EMAIL_PASS not configured');
             return res.status(500).json({ 
@@ -238,16 +241,7 @@ app.post('/api/send-email', async (req, res) => {
         }
         
         const nodemailer = require('nodemailer');
-        const htmlPdf = require('html-pdf-node');
-        
-        const pdfBuffer = await htmlPdf.file({
-            content: reportHtml,
-            name: `relatorio-${companyName || 'analise'}.pdf`,
-            format: 'A4',
-            printOptions: {
-                margin: { top: '10mm', bottom: '10mm', left: '10mm', right: '10mm' }
-            }
-        }).toBuffer();
+        console.log('Step 1: Modules loaded');
         
         const transporter = nodemailer.createTransport({
             service: 'gmail',
@@ -257,41 +251,40 @@ app.post('/api/send-email', async (req, res) => {
             }
         });
         
+        console.log('Step 2: Transporter created');
+        
         const mailOptions = {
             from: process.env.EMAIL_USER,
             to: email,
             subject: `Relatório de Maturidade de Inovação - ${companyName || 'Análise'}`,
             html: `
                 <div style="font-family: Arial, sans-serif; padding: 20px;">
-                    <h2 style="color: #2563eb;">Relatório de Maturidade de Inovação</h2>
+                    <h2 style="color: #1e3a5f;">Relatório de Maturidade de Inovação</h2>
                     <p>Olá,</p>
-                    <p>Segue em anexo o relatório de maturidade de inovação para <strong>${companyName || 'a empresa analisada'}</strong>.</p>
-                    <p>Este relatório contém:</p>
-                    <ul>
-                        <li>Análise das 5 dimensões de inovação</li>
-                        <li>Pontuação detalhada e benchmark competitivo</li>
-                        <li>Recomendações de melhoria</li>
-                        <li>Análise comparativa com o setor</li>
-                    </ul>
+                    <p>Segue o relatório de maturidade de inovação para <strong>${companyName || 'a empresa analisada'}</strong>.</p>
+                    <p>O relatório completo está disponível em PDF em anexo.</p>
                     <p>Atenciosamente,<br>Equipe IEBT Inovação</p>
                 </div>
-            `,
-            attachments: [
-                {
-                    filename: `relatorio-maturidade-${(companyName || 'analise').replace(/[^a-zA-Z0-9]/g, '-')}.pdf`,
-                    content: pdfBuffer
-                }
-            ]
+            `
         };
+        
+        console.log('Step 3: Sending email (without PDF attachment for now)...');
         
         await transporter.sendMail(mailOptions);
         
+        console.log('=== EMAIL ENVIADO COM SUCESSO ===');
         res.json({ success: true, message: 'Email enviado com sucesso!' });
     } catch (error) {
-        console.error('Erro ao enviar email:', error);
+        console.error('=== ERRO COMPLETO ===');
+        console.error('Error name:', error.name);
+        console.error('Error message:', error.message);
+        console.error('Error code:', error.code);
+        console.error('Full error:', error);
         res.status(500).json({ 
             error: 'Erro ao enviar email',
-            details: error.message 
+            details: error.message,
+            code: error.code,
+            name: error.name
         });
     }
 });
