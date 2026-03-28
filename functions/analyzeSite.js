@@ -2208,7 +2208,10 @@ function generateHTMLReport(result, analysis) {
             status.style.color = '#fff';
             
             try {
-                const response = await fetch('/api/send-email', {
+                const apiUrl = window.location.origin.includes('render') 
+                    ? window.location.origin + '/api/send-email' 
+                    : '/api/send-email';
+                const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
