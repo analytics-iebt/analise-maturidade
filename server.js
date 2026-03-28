@@ -230,10 +230,10 @@ app.post('/api/send-email', async (req, res) => {
     
     try {
         console.log('=== INICIANDO ENVIO DE EMAIL ===');
-        console.log('Email config:', process.env.EMAIL_USER ? 'USER OK' : 'USER MISSING', process.env.EMAIL_PASS ? 'PASS OK' : 'PASS MISSING');
+        console.log('Configuração de email:', process.env.EMAIL_USER ? 'USUÁRIO OK' : 'USUÁRIO FALTANDO', process.env.EMAIL_PASS ? 'SENHA OK' : 'SENHA FALTANDO');
         
         if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-            console.error('EMAIL_USER or EMAIL_PASS not configured');
+            console.error('EMAIL_USER ou EMAIL_PASS não configurados');
             return res.status(500).json({ 
                 error: 'Configuração de email incompleta',
                 details: 'As variáveis EMAIL_USER e EMAIL_PASS precisam estar configuradas no servidor'
@@ -241,7 +241,7 @@ app.post('/api/send-email', async (req, res) => {
         }
         
         const nodemailer = require('nodemailer');
-        console.log('Step 1: Modules loaded');
+        console.log('Etapa 1: Módulos carregados');
         
         const transporter = nodemailer.createTransport({
             service: 'gmail',
@@ -251,7 +251,7 @@ app.post('/api/send-email', async (req, res) => {
             }
         });
         
-        console.log('Step 2: Transporter created');
+        console.log('Etapa 2: Transportador criado');
         
         const mailOptions = {
             from: process.env.EMAIL_USER,
@@ -268,7 +268,7 @@ app.post('/api/send-email', async (req, res) => {
             `
         };
         
-        console.log('Step 3: Sending email (without PDF attachment for now)...');
+        console.log('Etapa 3: Enviando email...');
         
         await transporter.sendMail(mailOptions);
         
@@ -276,10 +276,10 @@ app.post('/api/send-email', async (req, res) => {
         res.json({ success: true, message: 'Email enviado com sucesso!' });
     } catch (error) {
         console.error('=== ERRO COMPLETO ===');
-        console.error('Error name:', error.name);
-        console.error('Error message:', error.message);
-        console.error('Error code:', error.code);
-        console.error('Full error:', error);
+        console.error('Nome do erro:', error.name);
+        console.error('Mensagem do erro:', error.message);
+        console.error('Código do erro:', error.code);
+        console.error('Erro completo:', error);
         res.status(500).json({ 
             error: 'Erro ao enviar email',
             details: error.message,
