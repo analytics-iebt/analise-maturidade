@@ -4,7 +4,7 @@ const cheerio = require('cheerio');
 class SiteScraper {
   constructor(config = {}) {
     this.timeout = config.timeout || 15000;
-    this.maxContentLength = config.maxContentLength || 50000;
+    this.maxContentLength = config.maxContentLength || 500000;
     this.userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
   }
 
@@ -20,7 +20,7 @@ class SiteScraper {
           'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7',
           'Accept-Encoding': 'gzip, deflate, br'
         },
-        maxContentLength: this.maxContentLength
+        maxBodyLength: Infinity
       });
 
       const $ = cheerio.load(response.data);
