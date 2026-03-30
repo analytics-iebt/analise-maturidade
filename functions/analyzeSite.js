@@ -2261,6 +2261,17 @@ function generateHTMLReport(result, analysis, lead = null) {
         .email-btn:hover { background: #228b75; }
         .email-btn:disabled { background: #6c757d; cursor: not-allowed; }
         .email-status { margin-top: 10px; text-align: center; font-size: 0.95rem; }
+        .action-bar { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 15px 20px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); display: flex; justify-content: center; gap: 15px; z-index: 1000; }
+        .btn-print, .btn-save { padding: 12px 30px; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+        .btn-print { background: var(--light); color: var(--primary); border: 2px solid var(--primary); }
+        .btn-print:hover { background: var(--primary); color: white; }
+        .btn-save { background: var(--success); color: white; }
+        .btn-save:hover { background: #228b75; }
+        .btn-save:disabled { opacity: 0.7; cursor: not-allowed; }
+        .btn-save.success { background: var(--success); }
+        .btn-save.error { background: var(--danger); }
+        @media print { .action-bar { display: none; } }
+        @media (max-width: 600px) { .action-bar { flex-direction: column; } .btn-print, .btn-save { width: 100%; } }
     </style>
 </head>
 <body>
@@ -2271,65 +2282,7 @@ function generateHTMLReport(result, analysis, lead = null) {
         <div class="score-badge">${result.scores.finalScore}/100</div>
         <br>
         <div class="level-badge">NÍVEL ${result.maturidade.level} - ${result.maturidade.name}</div>
-        <br><br>
-        <div id="emailForm" style="margin-top: 15px;">
-            <input type="email" id="emailInput" placeholder="Digite seu email para receber o relatório" style="padding: 12px 20px; border: 2px solid rgba(255,255,255,0.3); border-radius: 25px; font-size: 0.95rem; width: 300px; background: rgba(255,255,255,0.9); color: #333;">
-            <button class="email-btn" onclick="sendReport()" id="sendBtn">📧 Enviar PDF por Email</button>
-        </div>
-        <div id="emailStatus" style="margin-top: 10px; font-size: 0.95rem;"></div>
     </header>
-    
-    <script>
-        async function sendReport() {
-            const email = document.getElementById('emailInput').value;
-            const status = document.getElementById('emailStatus');
-            const btn = document.getElementById('sendBtn');
-            
-            if (!email || !email.includes('@')) {
-                status.textContent = 'Email inválido';
-                status.style.color = '#e76f51';
-                return;
-            }
-            
-            btn.disabled = true;
-            btn.textContent = 'Enviando...';
-            status.textContent = 'Gerando PDF e enviando...';
-            status.style.color = '#fff';
-            
-            try {
-                const apiUrl = window.location.origin.includes('render') 
-                    ? window.location.origin + '/api/send-email' 
-                    : '/api/send-email';
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        email: email,
-                        reportHtml: document.documentElement.outerHTML,
-                        companyName: '${result.empresa}'
-                    })
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    status.textContent = 'Email enviado com sucesso! Verifique sua caixa de entrada.';
-                    status.style.color = '#2a9d8f';
-                    btn.textContent = 'Enviado!';
-                } else {
-                    status.textContent = 'Erro: ' + (data.details || data.error || 'Tente novamente');
-                    status.style.color = '#e76f51';
-                    btn.disabled = false;
-                    btn.textContent = '📧 Enviar PDF por Email';
-                }
-            } catch (e) {
-                status.textContent = 'Erro de conexão';
-                status.style.color = '#e76f51';
-                btn.disabled = false;
-                btn.textContent = '📧 Enviar PDF por Email';
-            }
-        }
-    </script>
 
     <main class="container">
         <section class="card">
@@ -2646,11 +2599,64 @@ function generateHTMLReport(result, analysis, lead = null) {
         </section>
     </main>
 
+    <div class="action-bar">
+        <button class="btn-print" onclick="window.print()">Imprimir Relatório</button>
+        <button class="btn-save" id="saveReportBtn" onclick="saveReport()">Salvar Relatório</button>
+    </div>
+
     <footer class="footer">
         <p><strong>Relatório de Maturidade de Inovação</strong></p>
         <p>${result.empresa} • ${today}</p>
         <p>Gerado por Sistema de Análise de Maturidade${result.using_llm ? ' com IA' : ''}</p>
     </footer>
+
+    <script>
+        async function saveReport() {
+            const btn = document.getElementById('saveReportBtn');
+            btn.disabled = true;
+            btn.textContent = 'Salvando...';
+            
+            try {
+                const response = await fetch('/api/send-email', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'renanpasini@gmail.com',
+                        reportHtml: document.documentElement.outerHTML,
+                        companyName: '${result.empresa}'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    btn.textContent = '✓ Salvo com sucesso!';
+                    btn.classList.add('success');
+                    setTimeout(() => {
+                        btn.textContent = 'Salvar Relatório';
+                        btn.classList.remove('success');
+                        btn.disabled = false;
+                    }, 3000);
+                } else {
+                    btn.textContent = 'Erro ao salvar';
+                    btn.classList.add('error');
+                    setTimeout(() => {
+                        btn.textContent = 'Salvar Relatório';
+                        btn.classList.remove('error');
+                        btn.disabled = false;
+                    }, 3000);
+                }
+            } catch (error) {
+                btn.textContent = 'Erro ao salvar';
+                btn.classList.add('error');
+                setTimeout(() => {
+                    btn.textContent = 'Salvar Relatório';
+                    btn.classList.remove('error');
+                    btn.disabled = false;
+                }, 3000);
+            }
+        }
+    </script>
 </body>
 </html>`;
 }

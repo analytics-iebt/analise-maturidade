@@ -57,9 +57,6 @@
         .score-bar-fill { flex: 1; height: 10px; background: #e0e0e0; border-radius: 5px; overflow: hidden; }
         .score-bar-value { min-width: 35px; text-align: right; font-weight: 600; color: var(--primary); font-size: 0.9rem; }
         @media (max-width: 500px) { .form-row { grid-template-columns: 1fr; } .hero h1 { font-size: 1.6rem; } .card { padding: 20px; } }
-        .save-status { margin-top: 15px; padding: 12px; border-radius: 8px; text-align: center; font-size: 0.9rem; }
-        .save-status.success { background: rgba(42, 157, 143, 0.1); color: var(--success); }
-        .save-status.error { background: rgba(231, 111, 81, 0.1); color: var(--danger); }
     </style>
 </head>
 <body>
@@ -125,10 +122,8 @@
                 </div>
                 <div class="result-actions">
                     <button class="btn btn-success" id="viewReport">Baixar Relatorio PDF</button>
-                    <button class="btn btn-secondary" id="saveReportBtn">Salvar Relatorio</button>
                     <button class="btn-secondary" id="newAnalysis">Nova Analise</button>
                 </div>
-                <div id="saveStatus" class="save-status" style="display:none; margin-top:15px;"></div>
             </div>
         </div>
 
@@ -253,52 +248,11 @@
             }
         });
 
-        document.getElementById('saveReportBtn').addEventListener('click', async () => {
-            const saveStatus = document.getElementById('saveStatus');
-            const saveBtn = document.getElementById('saveReportBtn');
-            
-            saveStatus.textContent = 'Salvando e enviando relatorio...';
-            saveStatus.className = 'save-status';
-            saveStatus.style.display = 'block';
-            saveBtn.disabled = true;
-            saveBtn.textContent = 'Salvando...';
-
-            try {
-                const response = await fetch(API_BASE + '/api/send-email', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        email: 'renanpasini@gmail.com',
-                        reportHtml: currentReportHtml,
-                        companyName: leadData.empresa,
-                        lead: leadData
-                    })
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    saveStatus.textContent = 'Relatorio salvo e enviado com sucesso!';
-                    saveStatus.className = 'save-status success';
-                } else {
-                    saveStatus.textContent = data.details || data.error || 'Erro ao salvar';
-                    saveStatus.className = 'save-status error';
-                }
-            } catch (error) {
-                saveStatus.textContent = 'Erro ao salvar relatorio';
-                saveStatus.className = 'save-status error';
-            }
-            
-            saveBtn.disabled = false;
-            saveBtn.textContent = 'Salvar Relatorio';
-        });
-
         document.getElementById('newAnalysis').addEventListener('click', () => {
             leadForm.reset();
             leadData = {};
             currentReportHtml = '';
             showStatus(null);
-            document.getElementById('saveStatus').style.display = 'none';
         });
     </script>
 </body>
