@@ -158,7 +158,6 @@ app.post('/api/analyze', async (req, res) => {
             analysisId,
             steps: progress.steps,
             completed: true,
-            filename: filename,
             url: normalizedUrl,
             scores: result.llmResult.scores,
             maturity: result.llmResult.maturidade,
