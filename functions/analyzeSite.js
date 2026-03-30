@@ -396,18 +396,30 @@ Responda APENAS com o JSON, sem texto adicional.`;
     }
 
     let content = response.choices[0].message.content;
-    
+
     const jsonMatch = content.match(/```json\n?([\s\S]*?)\n?```/);
     if (jsonMatch) {
       content = jsonMatch[1];
     }
-    
-    content = content.replace(/[\x00-\x1F\x7F]/g, ' ');
-    content = content.replace(/,\s*}/g, '}').replace(/,\s*\]/g, ']');
-    content = content.replace(/\\/g, '\\\\');
-    
+
+    // Extrai apenas o bloco JSON (do primeiro { ao último })
     const directJson = content.replace(/^[^{]*/, '').replace(/[^}]*$/, '');
-    return JSON.parse(directJson);
+
+    // Tenta parse direto primeiro
+    try {
+      return JSON.parse(directJson);
+    } catch (_) {
+      // Se falhar, aplica limpezas cirúrgicas sem alterar escapes válidos
+      let cleaned = directJson;
+      // Remove vírgulas antes de } ou ]
+      cleaned = cleaned.replace(/,\s*([}\]])/g, '$1');
+      // Substitui quebras de linha reais dentro de strings por espaço
+      // (só afeta newlines fora de sequências de escape \n)
+      cleaned = cleaned.replace(/(?<!\\)\n/g, ' ').replace(/(?<!\\)\r/g, ' ').replace(/(?<!\\)\t/g, ' ');
+      // Remove outros caracteres de controle
+      cleaned = cleaned.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
+      return JSON.parse(cleaned);
+    }
     
   } catch (error) {
     console.error('Erro na chamada da LLM:', error.message);
