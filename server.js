@@ -332,7 +332,9 @@ app.post('/api/send-email', async (req, res) => {
             if (error.message) errorMessage = error.message;
             if (error.code === 'missing_required_parameter') errorMessage = 'Parâmetros obrigatórios faltando';
             if (error.code === 'invalid_parameter') errorMessage = 'Parâmetro inválido: ' + (error.field || '');
-            if (error.message?.includes('not authorized')) errorMessage = 'Email não autorizado. Verifique a configuração do Resend.';
+            if (error.message?.includes('not authorized') || error.message?.includes('only send testing emails')) {
+                errorMessage = 'Domínio não verificado. Acesse resend.com/domains para verificar um domínio e enviar para outros emails.';
+            }
             
             return res.status(500).json({ 
                 error: 'Erro ao enviar email',
