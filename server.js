@@ -289,6 +289,8 @@ app.post('/api/send-email', async (req, res) => {
         
         const isHtmlFallback = !isPdfSuccess;
         
+        const attachmentContent = Buffer.isBuffer(pdfBuffer) ? pdfBuffer.toString('base64') : (typeof pdfBuffer === 'string' ? Buffer.from(pdfBuffer).toString('base64') : pdfBuffer);
+        
         const { data, error } = await resend.emails.send({
             from: 'IEBT Inovação <onboarding@resend.dev>',
             to: [email],
@@ -317,7 +319,7 @@ app.post('/api/send-email', async (req, res) => {
             attachments: [
                 {
                     filename: `relatorio-maturidade-${safeName}`,
-                    content: isHtmlFallback ? pdfBuffer.toString('base64') : pdfBuffer.toString('base64')
+                    content: attachmentContent
                 }
             ]
         });
@@ -325,10 +327,16 @@ app.post('/api/send-email', async (req, res) => {
         console.log('Etapa 5: Resposta do Resend:', data, error);
         
         if (error) {
-            console.error('Erro do Resend:', error);
+            console.error('Erro do Resend:', JSON.stringify(error, null, 2));
+            let errorMessage = 'Erro ao enviar email';
+            if (error.message) errorMessage = error.message;
+            if (error.code === 'missing_required_parameter') errorMessage = 'Parâmetros obrigatórios faltando';
+            if (error.code === 'invalid_parameter') errorMessage = 'Parâmetro inválido: ' + (error.field || '');
+            if (error.message?.includes('not authorized')) errorMessage = 'Email não autorizado. Verifique a configuração do Resend.';
+            
             return res.status(500).json({ 
                 error: 'Erro ao enviar email',
-                details: error.message || 'Erro do Resend',
+                details: errorMessage,
                 code: error.code || 'RESEND_ERROR'
             });
         }
