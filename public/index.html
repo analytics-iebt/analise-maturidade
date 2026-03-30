@@ -57,12 +57,6 @@
         .score-bar-fill { flex: 1; height: 10px; background: #e0e0e0; border-radius: 5px; overflow: hidden; }
         .score-bar-value { min-width: 35px; text-align: right; font-weight: 600; color: var(--primary); font-size: 0.9rem; }
         @media (max-width: 500px) { .form-row { grid-template-columns: 1fr; } .hero h1 { font-size: 1.6rem; } .card { padding: 20px; } }
-        .email-section { margin-top: 20px; padding-top: 20px; border-top: 1px solid #e0e0e0; }
-        .email-section label { display: block; font-weight: 600; color: var(--primary); margin-bottom: 8px; font-size: 0.9rem; }
-        .email-section input { width: 100%; padding: 14px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1rem; margin-bottom: 10px; }
-        .email-status { margin-top: 10px; padding: 10px; border-radius: 8px; text-align: center; font-size: 0.9rem; display: none; }
-        .email-status.success { background: rgba(42, 157, 143, 0.1); color: var(--success); }
-        .email-status.error { background: rgba(231, 111, 81, 0.1); color: var(--danger); }
     </style>
 </head>
 <body>
@@ -128,14 +122,7 @@
                 </div>
                 <div class="result-actions">
                     <button class="btn btn-success" id="viewReport">Baixar Relatorio PDF</button>
-                    <button class="btn-secondary" id="sendEmailBtn">Receber por Email</button>
                     <button class="btn-secondary" id="newAnalysis">Nova Analise</button>
-                </div>
-                <div id="emailSection" class="email-section" style="display:none;">
-                    <label for="emailDestinatario">Email para receber o relatorio:</label>
-                    <input type="email" id="emailDestinatario" placeholder="email@exemplo.com">
-                    <button class="btn" id="sendEmailConfirm" style="margin-top:10px;">Enviar Email</button>
-                    <div id="emailStatus" class="email-status"></div>
                 </div>
             </div>
         </div>
@@ -239,7 +226,6 @@
                 showStatus(document.getElementById('statusSuccess'));
                 currentReportHtml = data.reportHtml || '';
                 if (data.scores) renderScoreBars(data.scores);
-                document.getElementById('emailDestinatario').value = leadData.email;
 
             } catch (error) {
                 console.error('Erro:', error);
@@ -262,60 +248,11 @@
             }
         });
 
-        document.getElementById('sendEmailBtn').addEventListener('click', () => {
-            const section = document.getElementById('emailSection');
-            section.style.display = section.style.display === 'none' ? 'block' : 'none';
-        });
-
-        document.getElementById('sendEmailConfirm').addEventListener('click', async () => {
-            const email = document.getElementById('emailDestinatario').value.trim();
-            const emailStatus = document.getElementById('emailStatus');
-            
-            if (!email) {
-                emailStatus.textContent = 'Digite um email valido';
-                emailStatus.className = 'email-status error';
-                emailStatus.style.display = 'block';
-                return;
-            }
-
-            emailStatus.textContent = 'Enviando...';
-            emailStatus.className = 'email-status';
-            emailStatus.style.display = 'block';
-
-            try {
-                const response = await fetch(API_BASE + '/api/send-email', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        email: email,
-                        reportHtml: currentReportHtml,
-                        companyName: leadData.empresa,
-                        lead: leadData
-                    })
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    emailStatus.textContent = 'Email enviado com sucesso!';
-                    emailStatus.className = 'email-status success';
-                } else {
-                    emailStatus.textContent = data.details || data.error || 'Erro ao enviar';
-                    emailStatus.className = 'email-status error';
-                }
-            } catch (error) {
-                emailStatus.textContent = 'Erro ao enviar email';
-                emailStatus.className = 'email-status error';
-            }
-        });
-
         document.getElementById('newAnalysis').addEventListener('click', () => {
             leadForm.reset();
             leadData = {};
             currentReportHtml = '';
             showStatus(null);
-            document.getElementById('emailSection').style.display = 'none';
-            document.getElementById('emailStatus').style.display = 'none';
         });
     </script>
 </body>
