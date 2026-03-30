@@ -6,67 +6,619 @@
     <title>Analisador de Maturidade de Inovacao</title>
     <style>
         :root {
-            --primary: #1e3a5f;
-            --secondary: #2d5a87;
-            --accent: #f4a261;
-            --success: #2a9d8f;
-            --warning: #e9c46a;
-            --danger: #e76f51;
-            --light: #f8f9fa;
-            --dark: #1d3557;
-            --gray: #6c757d;
+            color-scheme: dark light;
+            --shell-bg: #171717;
+            --shell-bg-alt: #101114;
+            --surface-solid: rgba(35, 35, 38, 0.92);
+            --surface-glass: rgba(31, 31, 35, 0.8);
+            --surface-soft: rgba(255, 255, 255, 0.04);
+            --surface-input: rgba(255, 255, 255, 0.05);
+            --border-strong: rgba(255, 255, 255, 0.12);
+            --border-soft: rgba(255, 255, 255, 0.08);
+            --text-primary: #f5f5f5;
+            --text-secondary: #c7c9d1;
+            --text-muted: #969aa5;
+            --accent: #ff6b35;
+            --accent-strong: #ef4444;
+            --success: #3fb984;
+            --warning: #f1b556;
+            --danger: #f07b72;
+            --shadow-xl: 0 30px 80px rgba(0, 0, 0, 0.42);
+            --shadow-md: 0 18px 40px rgba(0, 0, 0, 0.22);
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); min-height: 100vh; }
-        .container { max-width: 600px; margin: 0 auto; padding: 40px 20px; }
-        .hero { text-align: center; color: white; margin-bottom: 30px; }
-        .hero h1 { font-size: 2rem; margin-bottom: 15px; }
-        .hero p { font-size: 1rem; opacity: 0.9; max-width: 500px; margin: 0 auto; }
-        .card { background: white; border-radius: 16px; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; font-weight: 600; color: var(--primary); margin-bottom: 6px; font-size: 0.9rem; }
-        .form-group input { width: 100%; padding: 14px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1rem; }
-        .form-group input:focus { outline: none; border-color: var(--accent); }
-        .btn { width: 100%; padding: 16px; border: none; border-radius: 10px; font-size: 1.1rem; font-weight: 600; cursor: pointer; background: linear-gradient(135deg, var(--accent) 0%, #e8914a 100%); color: white; }
-        .btn:disabled { opacity: 0.7; cursor: not-allowed; }
-        .btn-success { background: linear-gradient(135deg, var(--success) 0%, #228b75 100%); }
-        .status { margin-top: 25px; padding: 20px; border-radius: 10px; display: none; }
-        .status.loading { display: block; background: rgba(42, 157, 143, 0.1); border: 1px solid var(--success); }
-        .status.error { background: rgba(231, 111, 81, 0.1); border: 1px solid var(--danger); color: var(--danger); }
-        .status.success { background: rgba(42, 157, 143, 0.1); border: 1px solid var(--success); color: var(--success); }
-        .status h3 { margin-bottom: 10px; font-size: 1.1rem; }
-        .status p { color: var(--gray); font-size: 0.95rem; }
-        .spinner-steps { margin-top: 15px; }
-        .step-indicator { display: flex; align-items: center; gap: 10px; padding: 8px 0; color: var(--gray); font-size: 0.9rem; }
-        .step-indicator-icon { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: bold; border: 2px solid #ccc; background: #f5f5f5; }
-        .step-indicator.pending .step-indicator-icon { background: #f5f5f5; border-color: #ccc; color: #999; }
-        .step-indicator.active .step-indicator-icon { background: var(--accent); border-color: var(--accent); color: white; animation: pulse 1s infinite; }
-        .step-indicator.done .step-indicator-icon { background: var(--success); border-color: var(--success); color: white; }
-        .step-indicator.done { color: var(--success); }
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-        .result-actions { margin-top: 20px; display: flex; gap: 10px; flex-direction: column; }
-        .btn-secondary { padding: 14px; background: var(--light); color: var(--primary); border: 2px solid var(--primary); border-radius: 8px; font-size: 0.95rem; font-weight: 600; cursor: pointer; text-decoration: none; text-align: center; }
-        .btn-secondary:hover { background: var(--primary); color: white; }
-        .footer { text-align: center; margin-top: 30px; color: rgba(255,255,255,0.6); font-size: 0.85rem; }
-        .score-preview { background: white; border-radius: 10px; padding: 20px; margin-top: 15px; }
-        .score-preview h4 { color: var(--primary); margin-bottom: 15px; font-size: 1.1rem; }
-        .score-bars { display: grid; gap: 10px; }
-        .score-bar { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; }
-        .score-bar-label { min-width: 120px; color: var(--gray); }
-        .score-bar-fill { flex: 1; height: 10px; background: #e0e0e0; border-radius: 5px; overflow: hidden; }
-        .score-bar-value { min-width: 35px; text-align: right; font-weight: 600; color: var(--primary); font-size: 0.9rem; }
-        @media (max-width: 500px) { .form-row { grid-template-columns: 1fr; } .hero h1 { font-size: 1.6rem; } .card { padding: 20px; } }
+
+        @media (prefers-color-scheme: light) {
+            :root {
+                --shell-bg: #f6f4ef;
+                --shell-bg-alt: #ece7de;
+                --surface-solid: rgba(255, 255, 255, 0.92);
+                --surface-glass: rgba(255, 255, 255, 0.84);
+                --surface-soft: rgba(255, 255, 255, 0.52);
+                --surface-input: rgba(255, 255, 255, 0.92);
+                --border-strong: rgba(148, 163, 184, 0.24);
+                --border-soft: rgba(148, 163, 184, 0.16);
+                --text-primary: #1f2937;
+                --text-secondary: #667085;
+                --text-muted: #7a8599;
+                --shadow-xl: 0 28px 70px rgba(15, 23, 42, 0.16);
+                --shadow-md: 0 16px 36px rgba(15, 23, 42, 0.1);
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at top right, rgba(255, 107, 53, 0.26), transparent 30%),
+                radial-gradient(circle at left center, rgba(239, 68, 68, 0.18), transparent 24%),
+                linear-gradient(180deg, var(--shell-bg) 0%, var(--shell-bg-alt) 100%);
+            overflow-x: hidden;
+        }
+
+        body::before,
+        body::after {
+            content: "";
+            position: fixed;
+            border-radius: 999px;
+            filter: blur(110px);
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.75;
+        }
+
+        body::before {
+            width: 20rem;
+            height: 20rem;
+            top: -8rem;
+            right: -7rem;
+            background: rgba(255, 107, 53, 0.22);
+        }
+
+        body::after {
+            width: 18rem;
+            height: 18rem;
+            bottom: -8rem;
+            left: -7rem;
+            background: rgba(239, 68, 68, 0.16);
+        }
+
+        .page-shell {
+            position: relative;
+            z-index: 1;
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 48px 20px 40px;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .hero-kicker {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 14px;
+            margin-bottom: 18px;
+            border-radius: 999px;
+            border: 1px solid var(--border-strong);
+            background: var(--surface-soft);
+            color: var(--text-secondary);
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .hero h1 {
+            margin-bottom: 14px;
+            font-size: clamp(2.2rem, 5vw, 3.4rem);
+            line-height: 1.04;
+            letter-spacing: -0.04em;
+            background: linear-gradient(135deg, var(--text-primary) 5%, #ff8b63 70%, var(--accent-strong) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .hero p {
+            max-width: 560px;
+            margin: 0 auto;
+            color: var(--text-secondary);
+            font-size: 1.02rem;
+        }
+
+        .hero-pills {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 22px;
+        }
+
+        .hero-pills span {
+            padding: 9px 14px;
+            border-radius: 999px;
+            border: 1px solid var(--border-soft);
+            background: var(--surface-soft);
+            color: var(--text-secondary);
+            font-size: 0.86rem;
+        }
+
+        .card {
+            position: relative;
+            overflow: hidden;
+            padding: 30px;
+            border-radius: 30px;
+            border: 1px solid var(--border-strong);
+            background: var(--surface-glass);
+            box-shadow: var(--shadow-xl);
+            backdrop-filter: blur(22px);
+        }
+
+        .card::before {
+            content: "";
+            position: absolute;
+            inset: 0 0 auto;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+        }
+
+        .section-head {
+            margin-bottom: 24px;
+        }
+
+        .section-kicker {
+            display: inline-block;
+            margin-bottom: 10px;
+            color: var(--accent);
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .section-head h2 {
+            margin-bottom: 8px;
+            font-size: 1.5rem;
+            line-height: 1.12;
+            letter-spacing: -0.03em;
+            color: var(--text-primary);
+        }
+
+        .section-head p {
+            color: var(--text-secondary);
+            font-size: 0.96rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.84rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px 16px;
+            border-radius: 16px;
+            border: 1px solid var(--border-strong);
+            background: var(--surface-input);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: border-color 180ms ease-out, background-color 180ms ease-out, transform 180ms ease-out, box-shadow 180ms ease-out;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+        }
+
+        .form-group input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: rgba(255, 107, 53, 0.7);
+            background: var(--surface-solid);
+            transform: translateY(-1px);
+            box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.16);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px 18px;
+            border: none;
+            border-radius: 16px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            color: #ffffff;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
+            box-shadow: 0 18px 32px rgba(255, 107, 53, 0.28);
+            transition: transform 180ms ease-out, box-shadow 180ms ease-out, opacity 180ms ease-out;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 22px 36px rgba(255, 107, 53, 0.34);
+        }
+
+        .btn:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
+        }
+
+        .status {
+            display: none;
+            margin-top: 24px;
+            padding: 22px;
+            border-radius: 22px;
+            border: 1px solid var(--border-strong);
+            background: var(--surface-solid);
+            box-shadow: var(--shadow-md);
+        }
+
+        .status h3 {
+            margin-bottom: 8px;
+            font-size: 1.05rem;
+            letter-spacing: -0.01em;
+            color: var(--text-primary);
+        }
+
+        .status p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .status.loading {
+            background: linear-gradient(135deg, rgba(255, 107, 53, 0.14), rgba(239, 68, 68, 0.08)), var(--surface-solid);
+            border-color: rgba(255, 107, 53, 0.34);
+        }
+
+        .status.error {
+            background: linear-gradient(135deg, rgba(240, 123, 114, 0.14), rgba(240, 123, 114, 0.05)), var(--surface-solid);
+            border-color: rgba(240, 123, 114, 0.34);
+        }
+
+        .status.error h3 {
+            color: var(--danger);
+        }
+
+        .status.success {
+            background: linear-gradient(135deg, rgba(63, 185, 132, 0.14), rgba(255, 107, 53, 0.08)), var(--surface-solid);
+            border-color: rgba(63, 185, 132, 0.32);
+        }
+
+        .status.success h3 {
+            color: var(--success);
+        }
+
+        .spinner-steps {
+            display: grid;
+            gap: 8px;
+            margin-top: 18px;
+        }
+
+        .step-indicator {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 16px;
+            background: var(--surface-soft);
+            border: 1px solid transparent;
+            color: var(--text-secondary);
+            font-size: 0.92rem;
+            transition: border-color 180ms ease-out, background-color 180ms ease-out, transform 180ms ease-out;
+        }
+
+        .step-indicator-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            border: 1px solid var(--border-strong);
+            background: rgba(255, 255, 255, 0.06);
+            flex-shrink: 0;
+        }
+
+        .step-indicator.pending {
+            opacity: 0.78;
+        }
+
+        .step-indicator.active {
+            transform: translateX(2px);
+            border-color: rgba(255, 107, 53, 0.34);
+            background: rgba(255, 107, 53, 0.12);
+            color: var(--text-primary);
+        }
+
+        .step-indicator.active .step-indicator-icon {
+            color: #ffffff;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
+            border-color: rgba(255, 107, 53, 0.64);
+            animation: pulse 1.2s ease-out infinite;
+        }
+
+        .step-indicator.done {
+            border-color: rgba(63, 185, 132, 0.28);
+            background: rgba(63, 185, 132, 0.12);
+            color: var(--text-primary);
+        }
+
+        .step-indicator.done .step-indicator-icon {
+            color: #ffffff;
+            background: var(--success);
+            border-color: rgba(63, 185, 132, 0.42);
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(255, 107, 53, 0.28);
+            }
+            50% {
+                transform: scale(1.08);
+                box-shadow: 0 0 0 8px rgba(255, 107, 53, 0);
+            }
+        }
+
+        .result-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .btn-secondary {
+            padding: 14px 16px;
+            border-radius: 16px;
+            border: 1px solid var(--border-strong);
+            background: var(--surface-soft);
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+            transition: border-color 180ms ease-out, background-color 180ms ease-out, transform 180ms ease-out, color 180ms ease-out;
+        }
+
+        .btn-secondary:hover {
+            border-color: rgba(255, 107, 53, 0.34);
+            background: rgba(255, 107, 53, 0.1);
+            color: var(--accent);
+            transform: translateY(-1px);
+        }
+
+        .score-preview {
+            margin-top: 18px;
+            padding: 22px;
+            border-radius: 20px;
+            border: 1px solid var(--border-soft);
+            background: var(--surface-soft);
+        }
+
+        .score-preview h4 {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+            font-size: 1.08rem;
+        }
+
+        .score-bars {
+            display: grid;
+            gap: 12px;
+        }
+
+        .score-bar {
+            display: grid;
+            grid-template-columns: minmax(0, 140px) 1fr auto;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.88rem;
+        }
+
+        .score-bar-label {
+            color: var(--text-secondary);
+        }
+
+        .score-bar-fill {
+            height: 10px;
+            border-radius: 999px;
+            overflow: hidden;
+            background: rgba(148, 163, 184, 0.18);
+        }
+
+        .score-bar-value {
+            min-width: 36px;
+            text-align: right;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .footer {
+            margin-top: 26px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.82rem;
+        }
+
+        .report-viewer {
+            position: fixed;
+            inset: 0;
+            z-index: 20;
+            display: none;
+            padding: 20px;
+            background: rgba(10, 11, 14, 0.58);
+            backdrop-filter: blur(18px);
+        }
+
+        .report-viewer.is-open {
+            display: block;
+        }
+
+        .report-panel {
+            width: min(1180px, 100%);
+            height: calc(100vh - 40px);
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border-radius: 28px;
+            border: 1px solid var(--border-strong);
+            background: var(--surface-solid);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .report-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 16px 18px;
+            border-bottom: 1px solid var(--border-strong);
+            background: var(--surface-soft);
+        }
+
+        .report-toolbar p {
+            color: var(--text-secondary);
+            font-size: 0.92rem;
+        }
+
+        .report-back {
+            padding: 12px 16px;
+            border-radius: 14px;
+            border: 1px solid var(--border-strong);
+            background: var(--surface-input);
+            color: var(--text-primary);
+            font-size: 0.92rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: border-color 180ms ease-out, background-color 180ms ease-out, transform 180ms ease-out;
+        }
+
+        .report-back:hover {
+            border-color: rgba(255, 107, 53, 0.34);
+            background: rgba(255, 107, 53, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .report-frame {
+            width: 100%;
+            flex: 1;
+            border: 0;
+            background: #ffffff;
+        }
+
+        @media (max-width: 640px) {
+            .page-shell {
+                padding: 32px 16px 28px;
+            }
+
+            .card {
+                padding: 22px;
+                border-radius: 24px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .hero-pills {
+                justify-content: flex-start;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .score-bar {
+                grid-template-columns: 1fr;
+                gap: 6px;
+            }
+
+            .score-bar-value {
+                text-align: left;
+            }
+
+            .report-viewer {
+                padding: 12px;
+            }
+
+            .report-panel {
+                height: calc(100vh - 24px);
+                border-radius: 22px;
+            }
+
+            .report-toolbar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .report-back {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
+    <main class="page-shell">
         <div class="hero">
             <h1>Analise de Maturidade de Inovacao</h1>
-            <p>Descubra o nivel de maturidade digital e inovacao de qualquer empresa.</p>
+            <p>Descubra o nivel de maturidade digital e inovacao de qualquer empresa a partir do site institucional e de sinais publicos da sua presenca online.</p>
+            <div class="hero-pills">
+                <span>5 dimensoes ponderadas</span>
+                <span>Benchmark setorial</span>
+                <span>Relatorio executivo</span>
+            </div>
         </div>
 
         <div class="card">
+            <div class="section-head">
+                <span class="section-kicker">Entrada da analise</span>
+                <h2>Informe os dados do contato e o site da empresa</h2>
+                <p>Geramos um diagnostico visual com score, gaps e comparativos para apoiar a conversa comercial.</p>
+            </div>
+
             <form id="leadForm">
                 <div class="form-row">
                     <div class="form-group">
@@ -96,7 +648,7 @@
             </form>
 
             <div class="status loading" id="statusLoading">
-                <h3>🔄 Gerando Relatorio...</h3>
+                <h3>Gerando Relatorio...</h3>
                 <p id="statusMessage">Aguarde...</p>
                 <div class="spinner-steps">
                     <div class="step-indicator pending" id="step1"><span class="step-indicator-icon">1</span><span>Salvando seus dados</span></div>
@@ -109,31 +661,44 @@
             </div>
 
             <div class="status error" id="statusError">
-                <h3>❌ Erro na Analise</h3>
+                <h3>Erro na Analise</h3>
                 <p id="errorMessage">Verifique os dados e tente novamente.</p>
             </div>
 
             <div class="status success" id="statusSuccess">
-                <h3>✅ Relatorio Pronto!</h3>
+                <h3>Relatorio Pronto</h3>
                 <p>Seu relatorio foi gerado com sucesso.</p>
                 <div class="score-preview" id="scorePreview">
-                    <h4>Score: <span id="finalScore">0</span>/100</h4>
+                    <h4><span>Score final</span><span><span id="finalScore">0</span>/100</span></h4>
                     <div class="score-bars" id="scoreBars"></div>
                 </div>
                 <div class="result-actions">
-                    <button class="btn btn-success" id="viewReport">Baixar Relatorio PDF</button>
+                    <button class="btn btn-success" id="viewReport">Ver Relatorio</button>
                     <button class="btn-secondary" id="newAnalysis">Nova Analise</button>
                 </div>
             </div>
         </div>
 
         <div class="footer"><p>IEBT Inovacao</p></div>
-    </div>
+    </main>
+
+    <section class="report-viewer" id="reportViewer" aria-hidden="true">
+        <div class="report-panel">
+            <div class="report-toolbar">
+                <p>Visualizacao do relatorio pronta. Use o botao abaixo para voltar ao formulario.</p>
+                <button class="report-back" id="closeReport">Voltar</button>
+            </div>
+            <iframe class="report-frame" id="reportFrame" title="Relatorio de maturidade"></iframe>
+        </div>
+    </section>
 
     <script>
         const API_BASE = '';
         const leadForm = document.getElementById('leadForm');
         const submitBtn = document.getElementById('submitBtn');
+        const reportViewer = document.getElementById('reportViewer');
+        const reportFrame = document.getElementById('reportFrame');
+        const closeReportBtn = document.getElementById('closeReport');
         
         let leadData = {};
         let currentReportHtml = '';
@@ -154,6 +719,21 @@
             if (el) el.style.display = 'block';
         }
 
+        function openReportViewer() {
+            if (!currentReportHtml) return;
+            reportFrame.srcdoc = currentReportHtml;
+            reportViewer.classList.add('is-open');
+            reportViewer.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeReportViewer() {
+            reportViewer.classList.remove('is-open');
+            reportViewer.setAttribute('aria-hidden', 'true');
+            reportFrame.srcdoc = '';
+            document.body.style.overflow = '';
+        }
+
         function getScoreColor(score) {
             if (score >= 70) return 'var(--success)';
             if (score >= 40) return 'var(--warning)';
@@ -172,7 +752,7 @@
             for (const [key, value] of Object.entries(scores)) {
                 if (key === 'finalScore') continue;
                 const name = dimensionNames[key] || key;
-                html += '<div class="score-bar"><span class="score-bar-label">' + name + '</span><div class="score-bar-fill"><div style="width:' + value + '%;height:100%;background:' + getScoreColor(value) + ';border-radius:4px;"></div></div><span class="score-bar-value">' + value + '</span></div>';
+                html += '<div class="score-bar"><span class="score-bar-label">' + name + '</span><div class="score-bar-fill"><div style="width:' + value + '%;height:100%;background:' + getScoreColor(value) + ';border-radius:999px;"></div></div><span class="score-bar-value">' + value + '</span></div>';
             }
             document.getElementById('scoreBars').innerHTML = html;
             document.getElementById('finalScore').textContent = scores.finalScore || 0;
@@ -241,18 +821,23 @@
         });
 
         document.getElementById('viewReport').addEventListener('click', () => {
-            if (currentReportHtml) {
-                const win = window.open('', '_blank');
-                win.document.write(currentReportHtml);
-                win.document.close();
-            }
+            openReportViewer();
         });
 
+        closeReportBtn.addEventListener('click', closeReportViewer);
+
         document.getElementById('newAnalysis').addEventListener('click', () => {
+            closeReportViewer();
             leadForm.reset();
             leadData = {};
             currentReportHtml = '';
             showStatus(null);
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && reportViewer.classList.contains('is-open')) {
+                closeReportViewer();
+            }
         });
     </script>
 </body>
